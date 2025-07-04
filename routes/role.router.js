@@ -18,8 +18,10 @@ const router=express.Router();
  *           type: string
  *         permission_ids:
  *           type: array
+ *           example:[1,2,3]
  *         by:
  *           type:integer
+ *            example: 1
  *           
  */
 
@@ -142,6 +144,7 @@ router
  *             properties:
  *               role_id:
  *                 type: integer
+ *                 example:1
  *               name:
  *                 type: string
  *     responses:
