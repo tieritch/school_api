@@ -10,22 +10,21 @@ dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
 });
 
-console.log("DATABASE_URL =", process.env.DATABASE_URL);
-const baseConfig = {
-  client: "postgresql",
-  connection: {
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false }, // 🔐 Nécessaire pour Neon
-  },
-  pool: {
-    min: 2,
-    max: 10,
-  },
-  migrations: {
-    tableName: "knex_migrations",
-    directory: path.resolve(__dirname, "./migrations"),
-  },
-};
+const baseConfig={
+    client: 'pg',
+    connection: {
+      database: process.env.DB_NAME,
+      user:     process.env.USER_NAME,
+      password: process.env.DB_PASSWORD,
+    },
+    pool: {
+      min: 2,
+      max: 10
+    },
+    migrations: {
+      tableName: 'knex_migrations'
+    }
+}
 
 module.exports = {
   development: baseConfig,
