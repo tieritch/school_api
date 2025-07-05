@@ -18,10 +18,10 @@ const router=express.Router();
  *           type: string
  *         permission_ids:
  *           type: array
- *           example:[1,2,3]
+ *           example: [1,2,3,4]
  *         by:
- *           type:integer
- *            example: 1
+ *           type: integer
+ *           example: 1
  *           
  */
 
@@ -144,9 +144,12 @@ router
  *             properties:
  *               role_id:
  *                 type: integer
- *                 example:1
+ *                 example: 1
  *               name:
  *                 type: string
+ *               permission_ids:
+ *                 type: array
+ *                 example: [1,2,3,4]
  *     responses:
  *       200:
  *         content:
@@ -176,14 +179,17 @@ router
         if (role) {
             throw new Error('Role already exists');
         }
-    } )
+    } ),
+    body('permission_ids.*').isInt().withMessage('An integer permission ID is required')
 
     ],
     
     async(req,res)=>{
         console.log('req.body');
         console.log(req.body);
-        const {name,role_id}=req.body;
+       // const {name,role_id}=req.body;
+        req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
+        const {name,role_id,by,permission_ids}=req.body;
         const errors=validationResult(req);
         if(!errors.isEmpty()){
 
@@ -193,7 +199,7 @@ router
         }
         try{
 
-            const role=await roleRepository.updateBy({name},{id:role_id});
+            const role=await roleRepository.updateBy({name,permission_ids},{id:role_id});
             console.log(role)
             res.json(role);
 
