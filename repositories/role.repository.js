@@ -82,9 +82,20 @@ const roleRepository={
      * @param {object} condition 
      * @returns {object}
      */
-    updateBy(information,condition){
-        return Role.query()
-            .patch(information).where(condition).returning('*')
+    async updateBy(information,condition){
+        let roleInfo={...entity};
+        delete roleInfo.permission_ids
+        const trx=await Role.startTransaction();
+        try{
+        const role=await Role.query(trx)
+            .patch(roleInfo).where(condition).returning('*');
+            await Role.$relatedQuery('permissions',trx).relate(information.permission_ids)
+        }
+        catch(err){
+            await trx.rollback();
+            console.log(err)
+            throw new Error(`error on server side:${err}`);
+        }
     }
 }
 module.exports=roleRepository;
