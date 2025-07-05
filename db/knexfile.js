@@ -5,11 +5,7 @@
  */
 const dotenv = require("dotenv");
 const path = require("path");
-
-dotenv.config({
-  path: path.resolve(__dirname, "../../.env"),
-});
-
+dotenv.config({path:path.resolve(__dirname, "../.env")});
 const baseConfig={
     client: 'pg',
     connection: {
@@ -23,6 +19,9 @@ const baseConfig={
     },
     migrations: {
       tableName: 'knex_migrations'
+    },
+    seeds: {
+      directory: path.resolve(__dirname, './seeds') // <- ici
     }
 }
 
