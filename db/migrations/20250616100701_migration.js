@@ -7,7 +7,7 @@ const bcrypt=require('bcrypt');
 
 dotenv.config();
 exports.up = async function(knex) {
-     //const hashedPass=await bcrypt.hash(process.env.ADMIN_PASS,10)
+
      await knex.schema
    
      .createTable('users',(table)=>{
@@ -53,41 +53,40 @@ exports.up = async function(knex) {
      })
 
      .createTable('table_resources',(table)=>{
-          table.integer('id');
+          table.increments('id');
           table.string('name').notNullable();
      })
      
      .createTable('roles_permissions_resources',(table)=>{
           table.integer('role_permission_id').references('id').inTable('roles_permissions').notNullable();
-          table.integer('resource_id').references('id').inTbale('table_resources').notNullable() 
+          table.integer('resource_id').references('id').inTable('table_resources').notNullable(); 
      })
-   
-   //  .raw(`INSERT INTO roles(name,by) VALUES('admin',1)`)
-   
-    // .raw(`INSERT INTO users(username,firstname,lastname,email,password) VALUES('admin',' ',' ','admin@gmail.com',${hashedPass.toString()})`)
-   
-    // .raw(`INSERT INTO users_roles(user_id,role_id) VALUES(1,1)`)
-
-   /*  .raw(`INSERT INTO permissions(name) VALUES('READ') `) 
-     .raw(`INSERT INTO permissions(name) VALUES('CREATE') `)
-     .raw(`INSERT INTO permissions(name) VALUES('UPDATE') `)
-     .raw(`INSERT INTO permissions(name) VALUES('DELETE') `)
-
-     // admin created by default
-    /* const hashedPass=await bcrypt.hash(process.env.ADMIN_PASS,10);
-     await knex('users').insert({
-          username:'admin',
-          firstname:'admin',
-          lastname:' ',
-          email:'admin@gmail.com',
-          password:hashedPass
-     })*/
      
-     // filling in users_roles
-     /*await knex('users_roles').insert({
-          role_id:1,
-          user_id:1
-     })*/
+     .createTable('grades',(table)=>{
+          table.increments('id');
+          table.string('name');
+          table.integer('by');
+          table.timestamps(true,true);
+     })
+
+     .createTable('school_years',(table)=>{
+          table.increments('id');
+          table.string('name').notNullable();
+     })
+
+     .createTable('students',(table)=>{
+          table.increments('id');
+          table.string('firstname').notNullable();
+          table.string('lastname').notNullable();
+         // table.integer('grade_id')
+     })
+
+     .createTable('enrollments',(table)=>{
+          table.integer('student_id').references('id').inTable('students').notNullable();
+          table.integer('grade_id').references('id').inTable('grades').notNullable();
+          table.integer('school_year_id').references('id').inTable('school_years').notNullable();
+          table.timestamps(true,true);
+     })
  
 };
 
@@ -104,68 +103,10 @@ exports.down = function(knex) {
     .dropTableIfExists('roles')
     .dropTableIfExists('refresh_tokens')
     .dropTableIfExists('permissions')
-    .dropTableIfExists('table_resources');
+    .dropTableIfExists('table_resources')
+    .dropTableIfExists('enrollments')
+    .dropTableIfExists('grades')
+    .dropTableIfExists('students')
+    .dropTableIfExists('school_years')
 };
 
-exports.seed=async function(knex){
-     
-     await knex('role_permission_resources').del();
-     await knex('roles_permissions').del();
-     await knex('users_roles').del();
-     await knex('table_resources').del();
-     await knex('permissions').del();
-     await knex('roles').del();
-     await knex('users').del();
-    
-      // Insert admin user
-     const hashedPass=await bcrypt.hash(process.env.ADMIN_PASS,10);
-     const [adminUserId] = await knex('users').insert({ 
-          username:'admin',
-          firstname: 'admin', 
-          lastname:'',
-          password:hashedPass,
-          email:'admin@gmail.com'
-     }).returning('id');
-      
-     // insert admin role
-     const [adminRoleId]=await knex('roles').insert({
-               name:'admin',
-               by:''
-      }).returning('id')
-
-     // Users ↔ Roles
-  await knex('users_roles').insert([
-     { user_id: adminUserId[0], role_id: adminRoleId[0] },
-   ]) 
-      
-   //insert permissions
-     const [readId,createId,updateId,deleteId]=await knex('permissions').insert([
-          {name:'READ'},
-          {name:'CREATE'},
-          {name:'UPDATE'},
-          {name:'DELETE'}
-     ]).returning('id') 
-  
-   // Roles ↔ Permissions
-   const rolePerms=await knex('roles_permissions').insert([
-     {role_id:adminRoleId[0],permission_id:readId[0]},
-     {role_id:adminRoleId[0],permission_id:createId[0]},
-     {role_id:adminRoleId[0],permission_id:updateId[0]},
-     {role_id:adminRoleId[0],permission_id:deleteId[0]}
-   ]).returning('id')
-
-  //Insert Resource
-  const [courseId,studentId]=await knex('table_resources').insert([
-     {name:'courses'},
-     {name:'students'}
-  ]).returning('id')  
-
-  // RolePermissionResource
- /* await knex('roles_permissions_resources').insert([
-     // admin has all permissions on all resources
-     {role_permission_id:rolePerms[0].id,recource_id:courseId[0]},
-     {role_permission_id:rolePerms[0].id,recource_id:courseId[1]},
-     {role_permission_id:rolePerms[1].id,recource_id:courseId[1]},
-  ])*/
-
-}
