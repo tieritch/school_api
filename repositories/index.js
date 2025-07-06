@@ -4,6 +4,7 @@ const refreshTokenRepository=require('./refresh_token.repository');
 const permissionRepository=require('./permission.repository');
 const schoolYearRepository=require('./school_year.repository');
 const gradeRepository=require('./grade.repository');
+const studentRepository=require('./student.repository');
 module.exports={
     userRepository,
     roleRepository,
@@ -11,4 +12,5 @@ module.exports={
     permissionRepository,
     schoolYearRepository,
     gradeRepository,
+    studentRepository,
 }

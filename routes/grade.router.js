@@ -56,6 +56,7 @@ router
     const grades=await gradeRepository.findAll();
     res.json(grades);
 })
+
  /**
  * @swagger
  * /grades/create:
@@ -235,7 +236,7 @@ router
 
     const {id}=req.params;
     const errors=validationResult(req);
-    
+
     if(!errors.isEmpty()){
         console.log(errors.array())
         return res.status(400).json({ errors: errors.array() });
