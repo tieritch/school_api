@@ -51,7 +51,7 @@ const gradeRepository={
     async remove(entity){
         await Grade.relatedQuery('students').for(entity.id).unrelate();
         await Grade.relatedQuery('schoolYears').for(entity.id).unrelate();
-        await Grade.relatedQuery('unrollments').for(entity.id).unrelate();
+        await Grade.relatedQuery('enrollments').for(entity.id).unrelate();
         return Grade.query().where(entity)
                 .delete().returning('*');
     },
