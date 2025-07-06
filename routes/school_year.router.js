@@ -92,7 +92,7 @@ const router=express.Router();
     [
      body('name').notEmpty().escape().trim().withMessage('year name required')
       .custom(async(value)=>{
-        const year=await schoolYearRepository.findBy({name:value})
+        const year=await schoolYearRepository.findBy({name:value.trim()})
         if(year){
             throw new Error('School year already exists')
         }
