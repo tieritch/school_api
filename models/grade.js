@@ -44,5 +44,11 @@ module.exports=class Grade extends Model {
       }
     };
   }
+  $beforeInsert(){
+    this.name=this.name.trim();
+  }
+  $beforeUpdate(){
+    this.name=this.name.trim();
+  }
 }
 
