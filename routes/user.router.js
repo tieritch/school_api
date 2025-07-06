@@ -2,7 +2,6 @@ const {userRepository,refreshTokenRepository}=require('../repositories');
 const {accessByToken,accessByRole}=require('../middlewares');
 const {query,body,param,validationResult}=require('express-validator');
 const {createToken,}=require('../utils');
-const joi=require('joi');
 const express=require('express');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
@@ -56,7 +55,7 @@ router
  *                 type: object
  *                 properties:
  *                   id:
- *                     type: string
+ *                     type: integer
  *                     description: The user ID
  *                   firstname:
  *                     type: string
