@@ -48,7 +48,7 @@ const schoolYeaRepository={
      * @returns {object}
      */
     remove(entity){
-        return ShoolYear.query().where(entity).delete().returning('*');
+        return SchoolYear.query().where(entity).delete().returning('*');
     },
 
     /**
