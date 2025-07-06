@@ -3,8 +3,6 @@ const {accessByToken,accessByRole}=require('../middlewares');
 const {query,body,param,validationResult}=require('express-validator');
 const {createToken,}=require('../utils');
 const express=require('express');
-const bcrypt=require('bcrypt');
-const jwt=require('jsonwebtoken');
 const router=express.Router();
 
 /**
