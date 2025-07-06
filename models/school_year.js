@@ -44,5 +44,12 @@ module.exports=class SchoolYear extends Model {
       }
     };
   }
+  
+  $beforeInsert(){
+    this.name=this.name.toLowerCase().trim();
+  }
+  $beforeUpdate(){
+    this.name=this.name.toLowerCase().trim();
+  }
 }
 
