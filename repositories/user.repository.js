@@ -1,14 +1,8 @@
 const {User}=require('../models');
 const {db_connect}=require('../db/db_connect');
 const {Model}=require("objection");
-//console.log(process.env.NODE_ENV)
 db_connect(process.env.NODE_ENV);
- /**
-  * setting connection to a DB
-  */
-//db_connect(process.env.NODE_ENV);
 
-//Model.knex(db);
 /**
  * @namespace
  */
