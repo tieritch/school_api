@@ -119,10 +119,50 @@ const router=express.Router();
         }
     })
  
+    /**
+ * @swagger
+ * /school_years/update:
+ *   put:
+ *     summary: change an existing school year
+ *     tags: [School-Years] 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               school_year_id:
+ *                 type: integer
+ *                 example: 1
+ *               name:
+ *                 type: string
+ *                 example: 2024-2025 or 2024/2025
+ *              
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               description: returns the modifiedd role
+ *       400:
+ *         content:
+ *           applicaction/json:
+ *             schema:
+ *               type: object 
+ *       500:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               
+ *                          
+ */
   .put('/school_years/update',accessByToken,
     
     [
-        body('id').notEmpty().withMessage('school year id required')
+        body('school_year_id').notEmpty().withMessage('school year id required')
             .isInt({min:1}).withMessage('id must be a positive integer'),
         
         body('name').notEmpty().escape().trim().withMessage('school year name required')
@@ -137,14 +177,17 @@ const router=express.Router();
     
     async(req,res)=>{
         
-        const {name,id}=req.body;
+        const {name,school_year_id}=req.body;
         const errors=validationResult(req);
         if(!errors.isEmpty()){
             console.log(errors.array())
             return res.status(400).json({ errors: errors.array() });
         }
         try{
-            const schoolYear=await schoolYearRepository.update({name},{id});
+            const schoolYear=await schoolYearRepository.update(
+                {name},
+                {id:school_year_id}
+           );
             res.json(schoolYear);
         }
         catch(err) {
@@ -152,4 +195,64 @@ const router=express.Router();
             res.status(500).json({error:'Server error'})
         }
     })
+
+  /**
+ * @swagger
+ * paths:
+ *  /school_years/remove/{id}:
+ *   delete:
+ *     summary: Delete school year
+ *     description: Delete a school year by its ID
+ *     tags: 
+ *       - School-Years
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *       400:
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *       401:
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object 
+ *       500:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object   
+ * 
+ */  
+  .delete('/school_years/remove/:id',accessByToken,
+    [
+        param('id').notEmpty().withMessage('school year id required').isInt({min:1}).withMessage('school year id must be a positive integer')
+    ],
+    async(req,res)=>{
+
+        const {id}=req.params;
+        const errors=validationResult(req);
+        if(!errors.isEmpty()){
+            console.log(errors.array());
+            return res.status(400).json({ errors: errors.array() });
+         }
+        try{
+            const schoolYear=await schoolYearRepository.remove({id});
+            console.log('________________')
+            console.log(schoolYear);
+            res.json(schoolYear);
+        } 
+        catch(err){
+            console.log(err.message);
+            res.status(500).json({error:err.message});
+        }
+  })  
  module.exports=router
