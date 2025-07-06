@@ -38,7 +38,7 @@ const gradeRepository={
       * @returns {object}
       */
     create(entity) {
-      return Grade.query().insert({entity}).returning('*') 
+      return Grade.query().insert(entity).returning('*') 
     },
 
     /**
