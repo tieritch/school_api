@@ -72,12 +72,16 @@ exports.up = async function(knex) {
      .createTable('school_years',(table)=>{
           table.increments('id');
           table.string('name').notNullable();
+          table.integer('by');
+          table.timestamps(true,true);
      })
 
      .createTable('students',(table)=>{
           table.increments('id');
           table.string('firstname').notNullable();
           table.string('lastname').notNullable();
+          table.integer('by');
+          table.timestamps(true,true);
          // table.integer('grade_id')
      })
 
@@ -85,6 +89,7 @@ exports.up = async function(knex) {
           table.integer('student_id').references('id').inTable('students').notNullable();
           table.integer('grade_id').references('id').inTable('grades').notNullable();
           table.integer('school_year_id').references('id').inTable('school_years').notNullable();
+          table.integer('by');
           table.timestamps(true,true);
      })
  
