@@ -14,6 +14,8 @@ const router=express.Router();
  *       properties:
  *         name: 
  *           type: string
+ *         by:
+ *           type: integer
  *        
  *           
  */
@@ -23,7 +25,7 @@ const router=express.Router();
  /**
   * @swagger
   * tags:
-  *   name: School-Year
+  *   name: School-Years
   *   description: School year management endpoints
   */
 
@@ -32,7 +34,7 @@ const router=express.Router();
  * /school_years:
  *   get:
  *     summary: Get all school years
- *     tags: [School-Year]
+ *     tags: [School-Years]
  *     responses:
  *       200:
  *         description: A list of school years
@@ -49,12 +51,43 @@ const router=express.Router();
  *                  
  *                  
  */
- .get('/school_years',async(req,res)=>{
+ .get('/school_years', async(req,res)=>{
     const years=await schoolYearRepository.findAll();
     console.log(years);
     res.json(years);
  })
 
+ /**
+ * @swagger
+ * /school_years/create:
+ *   post:
+ *     summary: creates a school year
+ *     tags: [School-Years] 
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: "#/components/schemas/SchoolYear"
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               description: returns the created school year
+ *       400:
+ *         content:
+ *           applicaction/json:
+ *             schema:
+ *               type: object
+ *       500:
+ *         content:
+ *           applicaction/json:
+ *             schema:
+ *               type: object         
+ *                          
+ */
  .post('/school_years/create',accessByToken,
     [
      body('name').notEmpty().escape().trim().withMessage('year name required')
