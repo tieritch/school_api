@@ -69,8 +69,12 @@ module.exports=class User extends Model {
    $beforeInsert(){
         this.username=this.username.trim();
         this.email=this.email.trim().toLowerCase();
+        this.password=this.password.trim();
    }
    $beforeUpdate(){
+       if(this.email)
         this.email=this.email.trim().toLowerCase();
+       if(this.password)
+        this.password=this.password.trim();
    }
 }
