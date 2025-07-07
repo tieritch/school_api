@@ -80,9 +80,11 @@ const userRepository={
         try{
             let userEntity={...information};
             delete userEntity.role_id;
-            const user=await User.query(trx).patch(userEntity).where(condition).returning('*').returning('*');
-            await user.$relatedQuery('roles',trx).relate(information.role_id);
-            await trx.commit();
+            const user=await User.query(trx).patch(userEntity).where(condition).returning('*');
+            if(information.role_id){
+                await user.$relatedQuery('roles',trx).relate(information.role_id);
+                await trx.commit();
+            }
             return user;
         }
         catch(err){
