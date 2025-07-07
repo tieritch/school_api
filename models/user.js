@@ -71,7 +71,6 @@ module.exports=class User extends Model {
         this.email=this.email.trim().toLowerCase();
    }
    $beforeUpdate(){
-        this.username=this.username.trim();
         this.email=this.email.trim().toLowerCase();
    }
 }
