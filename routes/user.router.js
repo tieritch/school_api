@@ -349,7 +349,7 @@ router
 /**
  * @swagger
  * /users/by_admin:
- *   put:
+ *   patch:
  *     summary: this endpoint is used by admin to change role of user
  *     tags: [Users]
  *     requestBody:
@@ -383,7 +383,7 @@ router
  *               type: object
  *                
  */
-.put('/users/by_admin', accessByToken,[
+.patch('/users/by_admin', accessByToken,[
 
       body('user_id').notEmpty().withMessage('user id required').isInt().withMessage('user id required as integer type'),
       body('role_id').notEmpty().withMessage('role id required').isInt().withMessage('role id required as integer type'),
@@ -414,6 +414,150 @@ router
      }
 })
 
+/**
+ * @swagger
+ * /users/profile/{id}:
+ *   patch:
+ *     summary: this endpoint is used user to change his profile
+ *     tags: [Users]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstname:
+ *                 type: string
+ *               lastname: 
+ *                 type: string
+ *               password: 
+ *                 type: string
+ *               new_pass:
+ *                 type: string
+ *               confirm_pass:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               by: 
+ *                 type: integer
+ *     responses:
+ *       200 :
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: string
+ *       400:
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *       401:
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *       500:
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                
+ */
+.patch('/users/profile/:id', accessByToken,
+   [
+     param('id').notEmpty().withMessage('ID is required')
+       .isInt().withMessage('ID must be an integer'),
+ 
+     body('firstname')
+       .optional().escape().trim()
+       .notEmpty().withMessage('First name cannot be empty'),
+ 
+     body('lastname')
+       .optional().escape().trim()
+       .notEmpty().withMessage('Last name cannot be empty'),
+ 
+     body('email')
+       .optional().escape().trim()
+       .isEmail().withMessage('Invalid email address'),
+ 
+     body('password')
+       .optional().escape().trim()
+       .isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+ 
+     body('new_pass')
+       .optional().escape().trim()
+       .isLength({ min: 6 }).withMessage('New password must be at least 6 characters long'),
+ 
+     body('confirm_pass')
+       .optional().escape().trim()
+       .isLength({ min: 6 }).withMessage('Confirmation password must be at least 6 characters long'),
+   ],
+ 
+   async (req, res) => {
+     const errors = validationResult(req);
+     if (!errors.isEmpty()) {
+       console.log(errors.array());
+       return res.status(400).json({ error: errors.array() });
+     }
+ 
+     const user = req.body;
+     const userId = parseInt(req.params.id, 10);
+ 
+     // Check ownership
+     if (req.user.id !== userId) {
+       return res.status(403).json({ error: 'You are only allowed to update your own profile' });
+     }
+ 
+     const userProfile = {};
+ 
+     if (user.firstname) userProfile.firstname = user.firstname;
+     if (user.lastname) userProfile.lastname = user.lastname;
+     if (user.email) userProfile.email = user.email;
+ 
+     userProfile.by = req.user.id;
+ 
+     try {
+       const userFromDB = await userRepository.findBy({ id: userId });
+ 
+       if (!userFromDB) {
+         return res.status(404).json({ error: 'User does not exist' });
+       }
+ 
+       // If password change is requested
+       if (user.password || user.new_pass || user.confirm_pass) {
+         if (!user.password || !user.new_pass || !user.confirm_pass) {
+           return res.status(400).json({ error: 'Old, new, and confirmation passwords are all required to update password' });
+         }
+ 
+         if (user.new_pass !== user.confirm_pass) {
+           return res.status(400).json({ error: 'New password and confirmation do not match' });
+         }
+ 
+         const isPasswordValid = await bcrypt.compare(user.password, userFromDB.password);
+         if (!isPasswordValid) {
+           return res.status(401).json({ error: 'You provided a wrong old password' });
+         }
+ 
+         // Hash the new password before saving
+         const hashedNewPassword = await bcrypt.hash(user.new_pass, 10);
+         userProfile.password = hashedNewPassword;
+       }
+ 
+       const userUpd = await userRepository.updateBy(userProfile, { id: userId });
+ 
+       return res.json(userUpd);
+     } catch (err) {
+       console.error(err.message);
+       return res.status(500).json({ error: 'Server error' });
+     }
+   }
+ )
+ 
 /**
  * @swagger
  * paths:

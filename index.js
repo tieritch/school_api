@@ -18,6 +18,7 @@ app.use(require('./routes/user.router'));
 app.use(require('./routes/role.router'));
 app.use(require('./routes/school_year.router'));
 app.use(require('./routes/grade.router'));
+app.use(require('./routes/student.router'));
 app.listen(port,()=>{
     console.log(`server on the port:${port}`)
 })
