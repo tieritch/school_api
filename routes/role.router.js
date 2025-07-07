@@ -92,7 +92,7 @@ router
  *                          
  */
 .post('/roles/create',
-    accessByToken,accessByRole('admin','create'),
+    accessByToken,//accessByRole('admin','create'),
     [
         body('name').notEmpty().escape().trim().withMessage('role name required')
         .custom(async(value)=>{
@@ -104,7 +104,7 @@ router
         body('permission_ids').isArray({min:1}).withMessage('you must at least provide one permission for this role'),
         body('permission_ids.*').isInt().withMessage('An integer permission ID is required')
      ],
-
+   
     async(req,res)=>{
         
         req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
@@ -126,13 +126,15 @@ router
             console.log(err);
             res.status(500).json({error:err.message});
         }
+            
+         
 })
 
 
 /**
  * @swagger
  * /roles/update:
- *   put:
+ *   patch:
  *     summary: change an existing role
  *     tags: [Roles] 
  *     requestBody:
@@ -170,7 +172,7 @@ router
  *               
  *                          
  */
-.put('/roles/update', accessByToken, [
+.patch('/roles/update', accessByToken, [
      
     body('role_id').notEmpty().withMessage('role id required').isInt().withMessage(' role id required as integer type'),
     body('name').notEmpty().withMessage('role name required')
