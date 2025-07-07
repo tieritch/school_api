@@ -20,7 +20,7 @@ async function generateHexStudentNumber() {
 
   if (lastStudent) {
     // Remove dashes, extract hex part after the year
-    const lastHexPart = lastStudent.student_number.replace(/-/g, '').slice(4);
+    const lastHexPart = lastStudent.id;//student_number.replace(/-/g, '').slice(4);
     nextSeq = parseInt(lastHexPart, 16) + 1;
   }
 
