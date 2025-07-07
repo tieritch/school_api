@@ -44,4 +44,10 @@ module.exports=class Student extends Model {
       }
     };
   }
+
+  $beforeUpdate(){
+    if(this.student_number){
+      this.student_number=this.student_number.toUpperCase();
+    }
+  }
 }
