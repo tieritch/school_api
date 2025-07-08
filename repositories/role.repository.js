@@ -53,7 +53,7 @@ const roleRepository={
                 resource_id
               });
             }
-          }          
+           }          
            await trx.commit();
            return role;
        }
@@ -73,9 +73,11 @@ const roleRepository={
      */
     async remove(entity){
         const user=await Role.relatedQuery('users').for( Role.query().select('id').where(entity)).first();
-        if(!user)
+        if(!user){
+            await Role.relatedQuery('permissions').for(Role.query().select('id').where(entity)).unrelate();
             return Role.query().where(entity)
                 .delete().returning('*');
+        }
         else{
             throw new Error(' can\'t delete a role granted to a user')
         }        
@@ -90,13 +92,25 @@ const roleRepository={
      * @returns {object}
      */
     async updateBy(information,condition){
-        let roleInfo={...entity};
-        delete roleInfo.permission_ids
+        let roleInfo={...information};
+        delete roleInfo.permission_ids;
+        delete roleInfo.resource_ids;
+        delete roleInfo.role_id;
         const trx=await Role.startTransaction();
         try{
         const role=await Role.query(trx)
             .patch(roleInfo).where(condition).returning('*');
-            await Role.$relatedQuery('permissions',trx).relate(information.permission_ids)
+            for (let permission_id of information.permission_ids) {
+                for (let resource_id of information.resource_ids) {
+                  await trx('roles_permissions_resources').insert({
+                    role_id: information.role_id,
+                    permission_id,
+                    resource_id
+                  });
+                }
+            }
+            await trx.commit();
+            return role; 
         }
         catch(err){
             await trx.rollback();
