@@ -29,6 +29,18 @@ module.exports=class Role extends Model{
                         },
                         to:'permissions.id'
                     }
+                },
+                resources:{
+                    relation:Model.ManyToManyRelation,
+                    modelClass:path(__dirname,'resources'),
+                    join:{
+                        from:'roles.id',
+                        through:{
+                            from:'roles_permissions_resources.role_id',
+                            to:'roles_permissions_resources.resource_id'
+                        },
+                        to:'resources.id'
+                    }
                 }
             }
         }
