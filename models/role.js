@@ -32,7 +32,7 @@ module.exports=class Role extends Model{
                 },
                 resources:{
                     relation:Model.ManyToManyRelation,
-                    modelClass:path.join(__dirname,'resources'),
+                    modelClass:path.join(__dirname,'resource'),
                     join:{
                         from:'roles.id',
                         through:{
