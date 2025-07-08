@@ -6,9 +6,9 @@ const bcrypt=require('bcrypt');
 exports.seed=async function(knex){
      
   await knex('roles_permissions_resources').del();
-  await knex('roles_permissions').del();
+  //await knex('roles_permissions').del();
   await knex('users_roles').del();
-  await knex('table_resources').del();
+  await knex('resources').del();
   await knex('permissions').del();
   await knex('roles').del();
   await knex('users').del();
@@ -43,15 +43,15 @@ await knex('users_roles').insert([
   ]).returning('id') 
 
 // Roles ↔ Permissions
-const rolePerms=await knex('roles_permissions').insert([
+/*const rolePerms=await knex('roles_permissions').insert([
   {role_id:adminRoleId,permission_id:readId},
   {role_id:adminRoleId,permission_id:createId},
   {role_id:adminRoleId,permission_id:updateId},
   {role_id:adminRoleId,permission_id:deleteId}
 ]).returning('id')
-
+*/
 //Insert Resource
-const [{id:courseId},{id:studentId}]=await knex('table_resources').insert([
+const [{id:courseId},{id:studentId}]=await knex('resources').insert([
   {name:'courses'},
   {name:'students'},
   {name:'grades'},
