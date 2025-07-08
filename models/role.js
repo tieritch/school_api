@@ -24,8 +24,8 @@ module.exports=class Role extends Model{
                     join:{
                         from:'roles.id',
                         through:{
-                            from:'roles_permissions.role_id',
-                            to:'roles_permissions.permission_id'
+                            from:'roles_permissions_resources.role_id',
+                            to:'roles_permissions_resources.permission_id'
                         },
                         to:'permissions.id'
                     }
