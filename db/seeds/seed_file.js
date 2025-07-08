@@ -42,14 +42,6 @@ await knex('users_roles').insert([
        {name:'DELETE'}
   ]).returning('id') 
 
-// Roles ↔ Permissions
-/*const rolePerms=await knex('roles_permissions').insert([
-  {role_id:adminRoleId,permission_id:readId},
-  {role_id:adminRoleId,permission_id:createId},
-  {role_id:adminRoleId,permission_id:updateId},
-  {role_id:adminRoleId,permission_id:deleteId}
-]).returning('id')
-*/
 //Insert Resource
 const [{id:courseId},{id:studentId}]=await knex('resources').insert([
   {name:'courses'},
@@ -57,14 +49,6 @@ const [{id:courseId},{id:studentId}]=await knex('resources').insert([
   {name:'grades'},
   {name:'school_years'}
 ]).returning('id')  
-
-// RolePermissionResource
-/* await knex('roles_permissions_resources').insert([
-  // admin has all permissions on all resources
-  {role_permission_id:rolePerms[0].id,recource_id:courseId[0]},
-  {role_permission_id:rolePerms[0].id,recource_id:courseId[1]},
-  {role_permission_id:rolePerms[1].id,recource_id:courseId[1]},
-])*/
 
 }
 
