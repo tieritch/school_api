@@ -5,7 +5,8 @@ const RefreshToken=require('./refresh_token');
 const Grade=require('./grade');
 const Student=require('./student');
 const SchoolYear=require('./school_year');
-const enrollment=require('./enrollment')
+const Enrollment=require('./enrollment');
+const Resource=require('./resource');
 module.exports={
     Role,
     User,
@@ -14,5 +15,6 @@ module.exports={
     Grade,
     Student,
     SchoolYear,
-    enrollment
+    Enrollment,
+    Resource
 }
