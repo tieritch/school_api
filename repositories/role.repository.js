@@ -44,9 +44,7 @@ const roleRepository={
            let roleEntity={...entity};
            delete roleEntity.permission_ids;
            const role=await Role.query(trx).insert(roleEntity).returning('*');
-          for(let id of entity.permission_ids){
-            await role.$relatedQuery('permissions',trx).relate(id)
-          }
+           await role.$relatedQuery('permissions',trx).relate(entity.permission_ids)
            await trx.commit();
            return role;
        }
