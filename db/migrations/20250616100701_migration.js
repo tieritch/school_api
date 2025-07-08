@@ -46,12 +46,6 @@ exports.up = async function(knex) {
           table.timestamps(true,true);
      })
 
-     /*.createTable('roles_permissions',(table)=>{
-          table.increments('id');
-          table.integer('role_id').references('id').inTable('roles').notNullable();
-          table.integer('permission_id').references('id').inTable('permissions').notNullable();
-     })*/
-
      .createTable('resources',(table)=>{
           table.increments('id');
           table.string('name').notNullable();
@@ -59,7 +53,7 @@ exports.up = async function(knex) {
      
      .createTable('roles_permissions_resources',(table)=>{
           table.integer('role_id').references('id').inTable('roles').notNullable();
-          table.integer('permission_id').references('id').inTable('roles').notNullable();
+          table.integer('permission_id').references('id').inTable('permissions').notNullable();
           table.integer('resource_id').references('id').inTable('resources').notNullable(); 
      })
      
