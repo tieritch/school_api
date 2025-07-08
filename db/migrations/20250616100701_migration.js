@@ -52,7 +52,7 @@ exports.up = async function(knex) {
           table.integer('permission_id').references('id').inTable('permissions').notNullable();
      })*/
 
-     .createTable('table_resources',(table)=>{
+     .createTable('resources',(table)=>{
           table.increments('id');
           table.string('name').notNullable();
      })
@@ -60,7 +60,7 @@ exports.up = async function(knex) {
      .createTable('roles_permissions_resources',(table)=>{
           table.integer('role_id').references('id').inTable('roles').notNullable();
           table.integer('permission_id').references('id').inTable('roles').notNullable();
-          table.integer('resource_id').references('id').inTable('table_resources').notNullable(); 
+          table.integer('resource_id').references('id').inTable('resources').notNullable(); 
      })
      
      .createTable('grades',(table)=>{
