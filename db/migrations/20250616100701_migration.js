@@ -109,7 +109,7 @@ exports.down = function(knex) {
     .dropTableIfExists('roles')
     .dropTableIfExists('refresh_tokens')
     .dropTableIfExists('permissions')
-    .dropTableIfExists('table_resources')
+    .dropTableIfExists('resources')
     .dropTableIfExists('enrollments')
     .dropTableIfExists('grades')
     .dropTableIfExists('students')
