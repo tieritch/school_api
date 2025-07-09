@@ -62,7 +62,7 @@ router
  *                     description: The user's name
  *                  
  */
-.get('/users',  async(req,res)=>{
+.get('/users', accessByToken, accessByRole(['READ'],['users']), async(req,res)=>{
     const users=await userRepository.findAll();
     console.log(users);
     res.send(users);
@@ -95,7 +95,8 @@ router
  *                   type:string 
  * 
  */
-.get('/users/:id', async(req,res)=>{
+.get('/users/:id',accessByToken,accessByRole(['READ'],['users']),
+ async(req,res)=>{
   const users=await userRepository.findAll();
   const user=users.find(value=>value.id==req.params.id);
   res.json(user);
@@ -139,7 +140,7 @@ router
  */
 .post('/users/create',
 
-   accessByToken, accessByRole('admin','create'),
+   accessByToken, accessByRole(['READ','CREATE'],['users']),
     
    [
       body('firstname').notEmpty().escape().trim().withMessage('first name required'),
@@ -383,7 +384,9 @@ router
  *               type: object
  *                
  */
-.patch('/users/by_admin', accessByToken,[
+.patch('/users/by_admin', accessByToken, accessByRole(['READ','UPDATE'],['users']),
+   
+   [
 
       body('user_id').notEmpty().withMessage('user id required').isInt().withMessage('user id required as integer type'),
       body('role_id').notEmpty().withMessage('role id required').isInt().withMessage('role id required as integer type'),
@@ -468,7 +471,7 @@ router
  *                type: object
  *                
  */
-.patch('/users/profile/:id', accessByToken,
+.patch('/users/profile/:id', accessByToken, accessByRole(['READ','UPDATE'],['users']),
    [
      param('id').notEmpty().withMessage('ID is required')
        .isInt().withMessage('ID must be an integer'),
@@ -594,7 +597,7 @@ router
  *               type: object   
  * 
  */
-.delete('/users/remove/:id',accessByToken,accessByRole('admin','delete'),
+.delete('/users/remove/:id',accessByToken,accessByRole(['DELETE'],['users']),
    [
       param('id').notEmpty().withMessage('user id required').isInt().withMessage('user id require as integer type')
    ],
