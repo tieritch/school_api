@@ -18,7 +18,10 @@ const router=express.Router();
  *           type: string
  *         permission_ids:
  *           type: array
- *           example: [1,2,3,4]
+ *           example: [1,2,3]
+ *         resource_ids:
+ *           type: array
+ *           example: [2,3]
  *         by:
  *           type: integer
  *           example: 1
@@ -58,7 +61,8 @@ router
  * 
  *                  
  */
-.get('/roles',async(req,res)=>{
+.get('/roles',accessByToken,accessByRole(['READ'],['roles']),
+  async(req,res)=>{
     const roles=await roleRepository.findAll();
     console.log(roles);
     res.json(roles);
@@ -92,33 +96,40 @@ router
  *                          
  */
 .post('/roles/create',
-    accessByToken,//accessByRole('admin','create'),
+    
+    accessByToken, accessByRole(['READ','CREATE'],['roles']),
+    
     [
         body('name').notEmpty().escape().trim().withMessage('role name required')
         .custom(async(value)=>{
-            const role=await roleRepository.findBy({name:value.trim().toLowerCase()})
+            const role=await roleRepository.findBy({name:value.toLowerCase()})
+            console.log("role",role)
             if (role) {
                 throw new Error('Role already exists');
-            }
+            };
+            return true;
         } ),
+        
         body('permission_ids').isArray({min:1}).withMessage('you must at least provide one permission for this role'),
-        body('permission_ids.*').isInt().withMessage('An integer permission ID is required')
+        body('permission_ids.*').isInt().withMessage('An integer permission ID is required'),
+        body('resource_ids').isArray({min:1}).withMessage('you must at least provide one resource for this role')
      ],
    
     async(req,res)=>{
         
         req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
-        const {name,by,permission_ids}=req.body;
-        const errors = validationResult(req);            
+        req.body.resource_ids=[...new Set(req.body.resource_ids)];
+        const {name,by,permission_ids,resource_ids}=req.body;
+        const errors = validationResult(req);   
         if (!errors.isEmpty()) {
            
-           console.log(errors.array())
+           console.log(errors.array());
            return res.status(400).json({ errors: errors.array() });
         
         }
         
         try{
-            const role=await roleRepository.create({name,by,permission_ids});
+            const role=await roleRepository.create({name,by,permission_ids,resource_ids});
             console.log(role)
             res.send(role);
         }
@@ -144,7 +155,7 @@ router
  *           schema:
  *             type: object
  *             properties:
- *               role_id:
+ *               id:
  *                 type: integer
  *                 example: 1
  *               name:
@@ -152,6 +163,9 @@ router
  *               permission_ids:
  *                 type: array
  *                 example: [1,2,3,4]
+ *               resource_ids:
+ *                 type: array
+ *                 example: [1,5,3]
  *     responses:
  *       200:
  *         content:
@@ -172,17 +186,27 @@ router
  *               
  *                          
  */
-.patch('/roles/update', accessByToken, [
+.patch('/roles/update', accessByToken,accessByRole(['UPDATE','READ'],['roles']), 
+    
+   [
      
-    body('role_id').notEmpty().withMessage('role id required').isInt().withMessage(' role id required as integer type'),
+    body('id').notEmpty().withMessage('role id required').isInt().withMessage(' role id required as integer type')
+    .custom(async(value)=>{        
+         const role=await roleRepository.findBy({id:value})
+         if (role && role.name=='admin') {
+             throw new Error('This role is protected');
+         }
+     } ),
+
     body('name').notEmpty().withMessage('role name required')
     .custom(async(value)=>{
         const role=await roleRepository.findBy({name:value.trim().toLowerCase()})
-        if (role) {
+        if (role && parseInt(role.id)==value.id) {
             throw new Error('Role already exists');
         }
     } ),
-    body('permission_ids.*').isInt().withMessage('An integer permission ID is required')
+    body('permission_ids.*').isInt().withMessage('An integer permission ID is required'),
+    body('resource_ids.*').isInt().withMessage('An integer resource ID is required')
 
     ],
     
@@ -191,7 +215,8 @@ router
         console.log(req.body);
        // const {name,role_id}=req.body;
         req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
-        const {name,role_id,by,permission_ids}=req.body;
+        req.body.resource_ids=[...new Set(req.body.resource_ids)];
+        const {name,id,by,permission_ids,resource_ids}=req.body;
         const errors=validationResult(req);
         if(!errors.isEmpty()){
 
@@ -201,7 +226,10 @@ router
         }
         try{
 
-            const role=await roleRepository.updateBy({name,permission_ids},{id:role_id});
+            const role=await roleRepository.updateBy(
+                {name,permission_ids,resource_ids,role_id:id},
+                {id}
+            );
             console.log(role)
             res.json(role);
 
@@ -249,10 +277,16 @@ router
  *               type: object   
  * 
  */
-.delete('/roles/remove/:id',accessByToken,accessByRole('admin','delete'),
+.delete('/roles/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['roles']),
     
     [
         param('id').notEmpty().withMessage('role id required').isInt().withMessage('role id required as integer type')
+          .custom(async(value)=>{
+             const role=await roleRepository.findBy({id:value});
+             if(role && role.name=='admin'){
+                throw new Error('this role is protected');
+             }
+          })
     ], 
      
     async(req,res)=>{
