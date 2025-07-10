@@ -74,7 +74,7 @@ router
  *         content:
  *           application/json:
  *             schema:
- *               type: array
+ *               type: object
  *               description: returns the created grade
  *       400:
  *         content:
