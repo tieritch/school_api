@@ -205,7 +205,7 @@ router
  *         content:
  *           application/json:
  *             schema:
- *               type: object
+ *               type: array
  *       400:
  *         content:
  *            application/json:

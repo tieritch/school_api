@@ -171,7 +171,7 @@ router
  *         content:
  *           application/json:
  *             schema:
- *               type: object
+ *               type: array
  *               description: returns the modifiedd role
  *       400:
  *         content:

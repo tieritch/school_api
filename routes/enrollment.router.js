@@ -258,7 +258,7 @@ router
  *         content:
  *           application/json:
  *             schema:
- *               type: object
+ *               type: array
  *               description: returns the modified enrollment
  *       400:
  *         content:
