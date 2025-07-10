@@ -6,6 +6,7 @@ const schoolYearRepository=require('./school_year.repository');
 const gradeRepository=require('./grade.repository');
 const studentRepository=require('./student.repository');
 const resourceRepository=require('./resources.repository');
+const enrollmentRepository=require('./enrollment.repository');
 module.exports={
     userRepository,
     roleRepository,
@@ -14,5 +15,6 @@ module.exports={
     schoolYearRepository,
     gradeRepository,
     studentRepository,
-    resourceRepository
+    resourceRepository,
+    enrollmentRepository
 }
