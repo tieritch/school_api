@@ -80,14 +80,14 @@ exports.up = async function(knex) {
          // table.integer('grade_id')
      })
 
-     .createTable('enrollments',(table)=>{
+    /* .createTable('enrollments',(table)=>{
           table.integer('student_id').references('id').inTable('students').notNullable();
           table.integer('grade_id').references('id').inTable('grades').notNullable();
           table.integer('school_year_id').references('id').inTable('school_years').notNullable();
           table.integer('by');
           table.timestamps(true,true);
      })
- 
+    */
 };
 
 /**
@@ -104,7 +104,6 @@ exports.down = function(knex) {
     .dropTableIfExists('refresh_tokens')
     .dropTableIfExists('permissions')
     .dropTableIfExists('resources')
-    .dropTableIfExists('enrollments')
     .dropTableIfExists('grades')
     .dropTableIfExists('students')
     .dropTableIfExists('school_years')
