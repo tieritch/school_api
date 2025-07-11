@@ -7,6 +7,7 @@ const Student=require('./student');
 const SchoolYear=require('./school_year');
 const Enrollment=require('./enrollment');
 const Resource=require('./resource');
+const CourseType=require('./course_type');
 module.exports={
     Role,
     User,
@@ -16,5 +17,6 @@ module.exports={
     Student,
     SchoolYear,
     Enrollment,
-    Resource
+    Resource,
+    CourseType
 }
