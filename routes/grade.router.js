@@ -52,7 +52,7 @@ router
  *                    
  *                  
  */
-.get('/grades',async(req,res)=>{
+.get('/grades',accessByToken, accessByRole(['READ'],['grades']), async(req,res)=>{
     const grades=await gradeRepository.findAll();
     res.json(grades);
 })
@@ -88,7 +88,7 @@ router
  *               type: object         
  *                          
  */
-.post('/grades/create',accessByToken,
+.post('/grades/create',accessByToken, accessByRole(['READ','CREATE'],['grades']),
     [
         body('name').notEmpty().escape().trim().withMessage('grade name required')
         .custom(async(value)=>{
@@ -159,7 +159,7 @@ router
  *               
  *                          
  */    
-.put('/grades/update',accessByToken,
+.put('/grades/update',accessByToken, accessByRole(['READ','UPDATE'],['grades']),
     [
         body('id').notEmpty().withMessage('grade id required')
         .isInt({min:1}).withMessage('id must be a positive integer'),
@@ -188,7 +188,7 @@ router
             console.log(err.message);
             res.status(500).json({error:'Server Error'});
         }
-    })
+})
 
 
 /**
@@ -227,7 +227,7 @@ router
  *               type: object   
  * 
  */
-.delete('/grades/remove/:id',accessByToken,
+.delete('/grades/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['grades']),
     [
         param('id').notEmpty().withMessage('user id required').isInt({min:1})
         .withMessage('grade id must be a positive integer')
