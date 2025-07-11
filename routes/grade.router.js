@@ -229,7 +229,7 @@ router
  */
 .delete('/grades/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['grades']),
     [
-        param('id').notEmpty().withMessage('user id required').isInt({min:1})
+        param('id').notEmpty().withMessage('grade id required').isInt({min:1})
         .withMessage('grade id must be a positive integer')
     ],
   async(req,res)=>{
