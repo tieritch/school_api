@@ -1,55 +1,45 @@
-/**
- * @param { import("knex").Knex } knex
- * @returns { Promise<void> } 
- */
-const bcrypt=require('bcrypt');
-exports.seed=async function(knex){
-     
-  await knex('roles_permissions_resources').del();
-  //await knex('roles_permissions').del();
-  await knex('users_roles').del();
+const bcrypt = require('bcrypt');
+
+exports.seed = async function (knex) {
+
   await knex('resources').del();
-  await knex('permissions').del();
   await knex('roles').del();
   await knex('users').del();
- 
-   // Insert admin user
-  const hashedPass=await bcrypt.hash(process.env.ADMIN_PASS,10);
-  const [{id:adminUserId}] = await knex('users').insert([{ 
-       username:'admin',
-       firstname: 'admin', 
-       lastname:'',
-       password:hashedPass,
-       email:'admin@gmail.com'
-  }]).returning('id');
-  // console.log('adminUserId:',adminUser.id)
-  // insert admin role
-  const [{id:adminRoleId}]=await knex('roles').insert({
-            name:'admin',
-            by:''
-   }).returning('id')
 
-  // Users ↔ Roles
-await knex('users_roles').insert([
-  { user_id: adminUserId, role_id: adminRoleId },
-]) 
-   
-//insert permissions
-  const [{id:readId},{id:createId},{id:updateId},{id:deleteId}]=await knex('permissions').insert([
-       {name:'READ'},
-       {name:'CREATE'},
-       {name:'UPDATE'},
-       {name:'DELETE'}
-  ]).returning('id') 
+  //  Insert admin user 
+  const hashedPass = await bcrypt.hash(process.env.ADMIN_PASS, 10);
+  const [{ id: adminUserId }] = await knex('users')
+    .insert([{
+      username: 'admin',
+      firstname: 'admin',
+      lastname: '',
+      password: hashedPass,
+      email: 'admin@gmail.com'
+    }])
+    .returning('id');
 
-//Insert Resource
-const [{id:courseId},{id:studentId}]=await knex('resources').insert([
-  {name:'courses'},
-  {name:'students'},
-  {name:'grades'},
-  {name:'school_years'},
-  {name:'roles'},
-]).returning('id')  
+  //  Insert admin role
+  const [{ id: adminRoleId }] = await knex('roles')
+    .insert({ name: 'admin', by: '' })
+    .returning('id');
 
-}
+  //  Link user ↔ role
+  await knex('users_roles').insert([
+    { user_id: adminUserId, role_id: adminRoleId }
+  ]);
 
+  // Permissions (idempotent)
+  const permissionNames = ['READ', 'CREATE', 'UPDATE', 'DELETE'];
+  await knex('permissions')
+    .insert(permissionNames.map(name => ({ name: name.toUpperCase() })))
+    .onConflict('name')  //  name must be  UNIQUE
+    .ignore();
+
+  //  Resources
+  const resourceNames = ['courses', 'students', 'grades', 'school_years', 'roles'];
+  await knex('resources')
+    .insert(resourceNames.map(name => ({ name:name.toLocaleLowerCase() })))
+    .onConflict('name')
+    .ignore();
+
+};
