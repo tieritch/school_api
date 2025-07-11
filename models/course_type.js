@@ -11,10 +11,10 @@ module.exports=class CourseType extends Model{
         return {
             courses:{
                 relation: Model.HasManyRelation,
-                modelClass: path.join(__dirname,'courses'),
+                modelClass: path.join(__dirname,'course'),
                 join:{
                     from:'course_types.id',
-                    to:'courses.course_type.id'
+                    to:'courses.course_type_id'
                 }
             }
         }
