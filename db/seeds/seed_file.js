@@ -47,7 +47,8 @@ const [{id:courseId},{id:studentId}]=await knex('resources').insert([
   {name:'courses'},
   {name:'students'},
   {name:'grades'},
-  {name:'school_years'}
+  {name:'school_years'},
+  {name:'roles'},
 ]).returning('id')  
 
 }
