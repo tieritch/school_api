@@ -52,9 +52,9 @@ exports.down = function(knex) {
   return knex.schema
 
   .dropTableIfExists('scores')
-  .dropTableIfExists('courses_assignment')
+  .dropTableIfExists('course_assignments')
   .dropTableIfExists('courses')
-  .dropTableIfExists('evaluation_type')
+  .dropTableIfExists('evaluation_types')
   .dropTableIfExists('course_types')
 
 
