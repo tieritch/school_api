@@ -4,10 +4,10 @@ const {Role,User}=require('.././models');
 
 function accessByRole(actions,resources){
   /* actions and resources parameters are arrays
-     actions and ids : READ     5      resources and ids: courses      5
-                       CREATE   6                         students     6
-                       UPDATE   7                         grades       7
-                       DELETE   8                         school_years 8 
+     actions and ids : READ     1      resources and ids: courses      1
+                       CREATE   2                         students     2
+                       UPDATE   3                         grades       3
+                       DELETE   4                         school_years 4 
                                         here will be more as I progress
    */
     return async (req, res, next) => {
