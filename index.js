@@ -2,6 +2,7 @@ const express=require('express');
 const dotenv=require('dotenv');
 const cors=require('cors');
 const cookieParser=require('cookie-parser');
+const knexInstance=require('./db/db_connect');
 const app=express();
 app.use(express.json());
 app.use(cookieParser())
@@ -10,7 +11,6 @@ app.use(cors({
     credentials:true
 }))
 dotenv.config();
-//db_connect(process.env.NODE_ENV);
 const port=process.env.PORT||8000;
 console.log(`the port is :${process.env.PORT}`)
 app.use(require('./routes/api_docs.router'));
