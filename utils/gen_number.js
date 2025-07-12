@@ -1,38 +1,17 @@
 const moment = require('moment');
-const {studentRepository}=require('../repositories');
-/**
- * Generate a student number in format: YYYY-XXX-XXX-XXX
- * Uses hexadecimal sequence per year for uniqueness and readability
- * 
- * @param {object} knex - Knex instance
- * @returns {Promise<string>} - Formatted student number
- */
+const  knexInstance = require('../db/db_connect'); // ton instance knex
+const {studentSeqRepository} = require('../repositories');
+
 async function generateHexStudentNumber() {
-  const year = moment().format('YYYY'); // Current year (e.g. 2025)
+  const year = moment().format('YYYY');
 
-  // Fetch the latest student number for this year
-  const lastStudent = await studentRepository.findAll()
-    .where('student_number', 'like', `${year}%`)
-    .orderBy('student_number', 'desc')
-    .first();
+  return await knexInstance.transaction(async trx => {
+    const nextSeq = await studentSeqRepository.getNextSeq(year, trx);
 
-  let nextSeq = 1;
+    const hexPart = nextSeq.toString(16).toUpperCase().padStart(9, '0');
+    const formatted = `${hexPart.slice(0, 3)}-${hexPart.slice(3, 6)}-${hexPart.slice(6)}`;
 
-  if (lastStudent) {
-    // Remove dashes, extract hex part after the year
-    const lastHexPart = lastStudent.id;//student_number.replace(/-/g, '').slice(4);
-    nextSeq = parseInt(lastHexPart, 16) + 1;
-  }
-
-  // Convert to hexadecimal, uppercase, and pad to 9 characters
-  const hexPart = nextSeq.toString(16).toUpperCase().padStart(9, '0');
-
-  // Format into 3 groups of 3 characters (e.g., 0FF-A11-00A)
-  const formattedHex = `${hexPart.slice(0, 3)}-${hexPart.slice(3, 6)}-${hexPart.slice(6, 9)}`;
-
-  // Final format: YYYY-XXX-XXX-XXX
-  return `${year}-${formattedHex}`;
+    return `${year}-${formatted}`;
+  });
 }
-
-
 module.exports=generateHexStudentNumber;
