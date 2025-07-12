@@ -52,7 +52,7 @@ NODE_ENV=              # e.g: development, production
 ## ▶️ Start the Server
 
 ```bash
-npm run dev
+npm run start
 ```
 
 ---
