@@ -1,4 +1,3 @@
-const {db_connect}=require('../db/db_connect');
 const {Resource}=require('../models');
 /**
  * @namespace resourceRepository

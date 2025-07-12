@@ -1,8 +1,5 @@
 const {SchoolYear}=require('../models');
-const {db_connect}=require('../db/db_connect');
 const {Model}=require("objection");
-
-db_connect(process.env.NODE_ENV);
 
 /**
  * @namespace

@@ -1,6 +1,4 @@
-const {db_connect}=require('../db/db_connect');
 const {Role}=require('../models');
-//db_connect(process.env.NODE_ENV);
 /**
  * @namespace roleRepository
  */
