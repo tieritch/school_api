@@ -18,6 +18,14 @@ module.exports=class Course extends Model{
                 to:'course_types.id'
              }
             },
+            scores:{
+                relation: Model.HasManyRelation,
+                modelClass: path.join(__dirname,'course'),
+                join:{
+                    from:'courses.id',
+                    to:'scores.course_id'
+                }
+            }
         }
     }
     $beforeInsert(){
