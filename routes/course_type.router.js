@@ -78,12 +78,12 @@ const router=express.Router();
  *               description: returns the created course type
  *       400:
  *         content:
- *           applicaction/json:
+ *           application/json:
  *             schema:
  *               type: object
  *       500:
  *         content:
- *           applicaction/json:
+ *           application/json:
  *             schema:
  *               type: object         
  *                          
@@ -172,8 +172,7 @@ const router=express.Router();
         
         body('name').notEmpty().withMessage(' course type name required')
         .custom(async(value)=>{
-            console.log('value name,',value);
-            const type=await courseTypeRepository.findBy({name: value.trim().toLocaleLowerCase()});
+            const type=await courseTypeRepository.findBy({name: value.trim().toLowerCase()});
             if(type){
                 throw new Error('this course type already exist')
             }
