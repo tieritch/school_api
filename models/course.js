@@ -20,7 +20,7 @@ module.exports=class Course extends Model{
             },
             scores:{
                 relation: Model.HasManyRelation,
-                modelClass: path.join(__dirname,'course'),
+                modelClass: path.join(__dirname,'score'),
                 join:{
                     from:'courses.id',
                     to:'scores.course_id'
@@ -29,9 +29,11 @@ module.exports=class Course extends Model{
         }
     }
     $beforeInsert(){
+        if(this.name)
         this.name=this.name.trim().toLowerCase();
     }
     $beforeUpdate(){
+        if(this.name)
         this.name=this.name.trim().toLowerCase();
     }
 }
