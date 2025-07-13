@@ -9,6 +9,7 @@ const resourceRepository=require('./resources.repository');
 const enrollmentRepository=require('./enrollment.repository');
 const courseTypeRepository=require('./course_type.repository');
 const studentSeqRepository=require('./stud_seq.repository');
+const courseRepository=require('./course.repository');
 module.exports={
     userRepository,
     roleRepository,
@@ -20,5 +21,6 @@ module.exports={
     resourceRepository,
     enrollmentRepository,
     courseTypeRepository,
-    studentSeqRepository
+    studentSeqRepository,
+    courseRepository
 }
