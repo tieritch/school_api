@@ -33,6 +33,14 @@ module.exports=class CourseAssign extends Model{
                     to:'grade.id'
                 }
             },
+            scores:{
+                relation: Model.HasManyRelation,
+                modelClass:path.join(__dirname,'score'),
+                join:{
+                    from:'course_assignments.id',
+                    to:'scores.course_assignment_id'
+                }
+            }
 
          }
     }
