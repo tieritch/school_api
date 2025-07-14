@@ -28,7 +28,7 @@ const courseTypeRepository={
         return type;
     },
 
-     /** Create a course repository based on informations provided by entity object and returns the created course type
+     /** Create a course based on informations provided by entity object and returns the created course type
       * @function 
       * @memberof courseTypeRepository
       * @param {object} entity
