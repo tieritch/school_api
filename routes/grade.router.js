@@ -15,8 +15,6 @@ const router=express.Router();
  *         name: 
  *           type: string
  *           example: 6th grade
- *         by:
- *           type: integer
  *        
  *           
  */
