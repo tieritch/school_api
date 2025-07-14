@@ -14,8 +14,6 @@ const router=express.Router();
  *       properties:
  *         name: 
  *           type: string
- *         by:
- *           type: integer
  *        
  *           
  */
