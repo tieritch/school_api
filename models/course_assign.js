@@ -4,7 +4,7 @@ const path=require('path');
 module.exports=class CourseAssign extends Model{
 
     static get tableName(){
-        return 'course_assigns';
+        return 'course_assignments';
     }
 
     static get relationMappings(){
