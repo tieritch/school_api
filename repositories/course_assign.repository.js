@@ -69,4 +69,4 @@ const CourseAssignRepository={
 
 }
 
-module.exports=CourseAssignRepository
+module.exports=CourseAssignRepository;
