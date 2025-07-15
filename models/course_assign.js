@@ -17,7 +17,7 @@ module.exports=class CourseAssign extends Model{
                     to:'courses.id'
                 }
             },
-            schooYears:{
+            schoolYears:{
                 relation: Model.BelongsToOneRelation,
                 modelClass: path.join(__dirname,'school_year'),
                 join:{
@@ -27,10 +27,10 @@ module.exports=class CourseAssign extends Model{
             },
             grades:{
                 relation: Model.BelongsToOneRelation,
-                modelClass: path.join(__dirname,'grades'),
+                modelClass: path.join(__dirname,'grade'),
                 join:{
                     from:'course_assignments.grade_id',
-                    to:'grade.id'
+                    to:'grades.id'
                 }
             },
             scores:{
