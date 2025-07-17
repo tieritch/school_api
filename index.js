@@ -24,6 +24,27 @@ app.use(require('./routes/enrollment.router'));
 app.use(require('./routes/course_type.router'));
 app.use(require('./routes/course.router'));
 app.use(require('./routes/course_assign.router'));
+
+// error middleware 
+app.use((err, req, res, next) => {
+  
+  console.error(err.message);
+  const status = err.status || 500;
+  
+  // If it's a validation error
+  if (err.details) {
+    return res.status(status).json({
+      error: 'Validation failed',
+      details: err.details,
+    });
+  }
+  // Otherwise, a generic server error
+  res.status(status).json({
+    error: err.message || 'Internal Server Error',
+  });
+});
+
+
 app.listen(port,()=>{
   console.log(`server on the port:${port}`);
 });
