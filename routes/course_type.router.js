@@ -3,7 +3,7 @@ const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
 const {query,body,param}=require('express-validator');
 const express=require('express');
 const router=express.Router();
-
+const {asyncHandler}=require('../utils');
 /**
  * @swagger
  *components:
@@ -99,20 +99,14 @@ const router=express.Router();
     ], 
     
     validateRequest,
-    
-    async(req,res)=>{
+
+    asyncHandler(async(req,res)=>{
     
         const {name}=req.body;
         
-        try{
-            const course=await courseTypeRepository.create({name,by:req.user.id});
-            res.json(course);
-        }
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:'Server Error'});
-        }
-})
+        const course=await courseTypeRepository.create({name,by:req.user.id});
+        res.json(course);
+ }))
 
 
 /**
@@ -176,18 +170,12 @@ const router=express.Router();
     
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
         
         const {name,id}=req.body;
-        try{
-            const type=await courseTypeRepository.updateBy({name},{id});
-            res.json(type);
-        }
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:'Server Error'});
-        }
-})
+        const type=await courseTypeRepository.updateBy({name},{id});
+        res.json(type);
+  }))
 
 /**
  * @swagger
@@ -232,16 +220,10 @@ const router=express.Router();
 
   validateRequest,
 
-  async(req,res)=>{
-    const {id}=req.params;
+  asyncHandler(async(req,res)=>{
+        const {id}=req.params;
 
-    try{
-         const type=await courseTypeRepository.remove({id});
-         res.json(type);
-    }
-    catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'error server'})
-    }
-  })
+        const type=await courseTypeRepository.remove({id});
+        res.json(type);
+  }))
 module.exports=router;

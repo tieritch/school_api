@@ -1,7 +1,7 @@
 const {userRepository,refreshTokenRepository}=require('../repositories');
 const {accessByToken,accessByRole, validateRequest}=require('../middlewares');
-const {query,body,param,validationResult}=require('express-validator');
-const {createToken,generateHexStudentNumber}=require('../utils');
+const {query,body,param}=require('express-validator');
+const {createToken,generateHexStudentNumber,asyncHandler}=require('../utils');
 const express=require('express');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
@@ -170,14 +170,11 @@ router
 
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
 
       const {firstname,lastname,email,password,username,role_id}=req.body;
-      console.log(req.body);
-
-      try{
-
-        const user=await userRepository.create({
+     
+      const user=await userRepository.create({
           firstname,
           lastname,
           email,
@@ -185,13 +182,7 @@ router
           username,
           role_id});
         res.send(user);
-      }
-
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    })
+    }))
 
 
 /**
@@ -244,9 +235,9 @@ router
 
   async(req,res)=>{
 
+    const user=await userRepository.findBy({username:req.body.username})
     const accessToken=createToken.access(user.toJSON());
     const refreshToken=createToken.refresh(user.toJSON());
-
     await refreshTokenRepository.create({
       token:await bcrypt.hash(refreshToken,10),
       user_id:user.id,
@@ -308,26 +299,18 @@ router
       body('id').notEmpty().withMessage(' user id required').isInt().withMessage(' required user id as integer type'),
     ],
     validateRequest,
-    async(req,res)=>{
+    
+    asyncHandler(async(req,res)=>{
 
       const { id}=req.body;
-      const {refreshToken,accessToken}=req.cookies;
-
-      try{
-
-        await refreshTokenRepository.remove({user_id:id});
-        res.clearCookie('accessToken');
-        res.clearCookie('refreshToken');
-        res.json({success:'successful logout'});
-
-      }
-      catch(err){
-
-        console.log(err.message);
-        res.status(500).json({error:'Server error'});
-
-      }
-    })
+      const {refreshToken,accessToken}=req.cookies;  
+       
+      await refreshTokenRepository.remove({user_id:id});
+      res.clearCookie('accessToken');
+      res.clearCookie('refreshToken');
+      res.json({success:'successful logout'});
+      
+    }))
 
 /**
  * @swagger
@@ -373,24 +356,21 @@ router
       body('user_id').notEmpty().withMessage('user id required').isInt().withMessage('user id required as integer type'),
       body('role_id').notEmpty().withMessage('role id required').isInt().withMessage('role id required as integer type'),
     ],
+   
     validateRequest,
-    async(req,res)=>{
+   
+    asyncHandler(async(req,res)=>{
 
       const {user_id,role_id}=req.body;
-      try{
-        const user=await userRepository.updateBy(
-          {
-            role_id,by:req.user.id,
-          },{
-            user_id,
-          });
-        res.json(user);
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server error'});
-      }
-    })
+      const user=await userRepository.updateBy(
+      {
+         role_id,by:req.user.id,
+      },{
+         user_id,
+      });
+      res.json(user);
+      }   
+    ))
 
 /**
  * @swagger
@@ -511,7 +491,7 @@ router
     ],
     validateRequest,
 
-    async (req, res) => {
+    asyncHandler(async (req, res) => {
 
 
       const userProfile = {};
@@ -523,17 +503,12 @@ router
       userProfile.by = req.user.id;
       const {id}=req.params;
       const whereCondition={id};
-      try {
 
-        const userUpd = await userRepository.updateBy(userProfile, whereCondition);
-
-        return res.json(userUpd);
-      } catch (err) {
-        console.error(err.message);
-        return res.status(500).json({ error: 'Server error' });
+      const userUpd = await userRepository.updateBy(userProfile, whereCondition);
+      return res.json(userUpd);
       }
-    },
-  )
+    ,
+  ))
 
 /**
  * @swagger
@@ -575,14 +550,12 @@ router
     [
       param('id').notEmpty().withMessage('user id required').isInt().withMessage('user id require as integer type'),
     ],
-    async(req,res)=>{
+    
+    validateRequest,
+
+    asyncHandler(async(req,res)=>{
       const {id}=req.params;
-      const errors=validationResult(req);
-      if(!errors.isEmpty()){
-        console.log(errors.array());
-        return res.status(400).json({ errors: errors.array() });
-      }
-      try{
+    
         const admin=await userRepository.findBy({id,username:'admin'});
         // we don't delete the default admin use (whose username is admin);
         if(!admin){
@@ -590,11 +563,5 @@ router
           console.log('deleted user:',user);
           res.json(user);
         }
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:err.message});
-      }
-
-    });
+    }));
 module.exports=router;

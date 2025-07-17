@@ -2,9 +2,10 @@ const{gradeRepository,schoolYearRepository,
   studentRepository,enrollmentRepository,
 }=require('../repositories');
 const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
-const {query,body,param,validationResult}=require('express-validator');
+const {query,body,param}=require('express-validator');
 const express=require('express');
 const { Enrollment } = require('../models');
+const {asyncHandler}=require('../utils');
 const router=express.Router();
 
 /**
@@ -141,22 +142,17 @@ router
 
     validateRequest,
 
-    async(req,res)=>{
-      const {student_id,school_year_id,grade_id}=req.body;
-      try{
+    asyncHandler(async(req,res)=>{
+  
+        const {student_id,school_year_id,grade_id}=req.body;
+  
         const enrollment=await enrollmentRepository.create({student_id,school_year_id,grade_id});
         const stdWithGraph=await studentRepository
           .findAll().withGraphFetched('[grades,schoolYears]')
           .where({id:student_id});
         console.log(JSON.stringify(stdWithGraph,null,2));
         res.send(stdWithGraph[0]);
-
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    })
+    }))
 
 /**
  * @swagger
@@ -208,22 +204,15 @@ router
 
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
       // console.log('DELETE HIT', req.params.id);
-      const{id}=req.params;
-      try{
+        const{id}=req.params;
         const enroll=await enrollmentRepository.remove({id});
         const stdWithGraph=await studentRepository
-          .findAll().withGraphFetched('[grades,schoolYears]')
-          .where({id:enroll[0].student_id});
-        res.json(stdWithGraph);
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    },
-  )
+        .findAll().withGraphFetched('[grades,schoolYears]')
+        .where({id:enroll[0].student_id});
+        res.json(stdWithGraph);   
+    }))
 
 
 /**
@@ -303,7 +292,7 @@ router
 
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
 
       const enrollment={};
       if(req.body.grade_id){
@@ -313,22 +302,16 @@ router
         enrollment.school_year_id=req.body.school_year_id;
       }
       enrollment.id=req.body.id;
-      try{
-        const enroll=await enrollmentRepository.updateBy(
-          {
-            grade_id:enrollment.grade_id,
-            school_year_id:enrollment.school_year_id,
-          },{
-            id:enrollment.id,
-          });
-        const stdWithGraph=await studentRepository
+      const enroll=await enrollmentRepository.updateBy(
+      {
+        grade_id:enrollment.grade_id,
+        school_year_id:enrollment.school_year_id,
+       },{
+          id:enrollment.id,
+        });
+       const stdWithGraph=await studentRepository
           .findAll().withGraphFetched('[grades,schoolYears]')
           .where({id:enroll[0].student_id});
         res.json(stdWithGraph);
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    });
+    }));
 module.exports=router;

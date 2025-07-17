@@ -2,7 +2,7 @@ const {courseRepository,courseTypeRepository}=require('../repositories');
 const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
 const {query,body,param}=require('express-validator');
 const express=require('express');
-
+const {asyncHandler}=require('../utils');
 const router=express.Router();
 
 /**
@@ -130,19 +130,12 @@ router
 
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
 
-      const {name,course_type_id,max_score}=req.body;
-
-      try{
+        const {name,course_type_id,max_score}=req.body;
         const course=await courseRepository.create({name,course_type_id,max_score,by:req.user.id});
         res.json(course);
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    })
+    }))
 
 /**
  * @swagger
@@ -226,9 +219,8 @@ router
 
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
 
-      try{
         const courseInfo={};
         if(req.body.name){
           courseInfo.name=req.body.name;
@@ -243,12 +235,7 @@ router
         const whereCondition={id:req.body.id};
         const course=await courseRepository.updateBy(courseInfo,whereCondition);
         res.json(course);
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    })
+    }))
 
 /**
  * @swagger
@@ -300,17 +287,11 @@ router
 
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
 
-      try{
         const {id}=req.params;
         const course=await courseRepository.remove({id});
         res.json(course);
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    });
+    }));
 
 module.exports=router;

@@ -3,7 +3,7 @@ const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
 const {query,body,param}=require('express-validator');
 const express=require('express');
 const router=express.Router();
-
+const {asyncHandler}=require('../utils');
 /**
  * @swagger
  *components:
@@ -100,17 +100,11 @@ router
 
     validateRequest,
 
-    async(req,res)=>{
-      const {name}=req.body;
-      try{
+    asyncHandler(async(req,res)=>{
+        const {name}=req.body;
         const grade=await gradeRepository.create({name,by:req.user.id});
         res.json(grade);
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    })
+    }))
 
 
 /**
@@ -169,17 +163,11 @@ router
     
     validateRequest,
 
-    async(req,res)=>{
-      const {name,id}=req.body;
-      try{
+    asyncHandler(async(req,res)=>{
+        const {name,id}=req.body;
         const grade=await gradeRepository.updateBy({name,by:req.user.id},{id});
         res.json(grade);
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    })
+    }))
 
 
 /**
@@ -226,17 +214,11 @@ router
 
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
 
-      const {id}=req.params;
-      try{
+        const {id}=req.params;
         const grade=await gradeRepository.remove({id});
         res.json(grade);
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-    });
+    }));
 
 module.exports=router;

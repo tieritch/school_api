@@ -1,6 +1,7 @@
 const {roleRepository}=require('../repositories');
 const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
-const {query,body,param,validationResult}=require('express-validator');
+const {query,body,param}=require('express-validator');
+const {asyncHandler}=require('../utils');
 const express=require('express');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
@@ -112,26 +113,17 @@ router
         body('resource_ids').isArray({min:1}).withMessage('you must at least provide one resource for this role')
      ],
     
-     validateRequest,
-     
-    async(req,res)=>{
+    validateRequest,
+
+    asyncHandler(async(req,res)=>{
         
         req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
         req.body.resource_ids=[...new Set(req.body.resource_ids)];
         const {name,by,permission_ids,resource_ids}=req.body;
-        
-        try{
-            const role=await roleRepository.create({name,by:req.user.id,permission_ids,resource_ids});
-            console.log(role)
-            res.send(role);
-        }
-        catch(err){
-            console.log(err);
-            res.status(500).json({error:err.message});
-        }
-            
-         
-})
+    
+        const role=await roleRepository.create({name,by:req.user.id,permission_ids,resource_ids});
+        res.send(role)      
+  }))
 
 
 /**
@@ -204,27 +196,17 @@ router
     
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
        
         req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
         req.body.resource_ids=[...new Set(req.body.resource_ids)];
         const {name,id,by,permission_ids,resource_ids}=req.body;
-        try{
-
-            const role=await roleRepository.updateBy(
-                {name,permission_ids,resource_ids,role_id:id},
-                {id}
-            );
-            console.log(role)
-            res.json(role);
-
-        }
-       catch(err){
-            
-            console.log(err);
-            res.status(500).json({error:'Server error'})
-       }
-})
+        const role=await roleRepository.updateBy(
+            {name,permission_ids,resource_ids,role_id:id},
+            {id}
+        );
+       res.json(role);
+}))
 
 /**
  * @swagger
@@ -276,16 +258,9 @@ router
     
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
 
-        try{
-            const user=await roleRepository.remove({id:req.params.id});
-            console.log('deleted user:',user)
-            res.json(user);
-        }
-        catch(err){
-            console.log(err);
-            res.status(500).json({error:err.message})
-        }
-})
+    const user=await roleRepository.remove({id:req.params.id});
+    res.json(user);
+}))
 module.exports=router;

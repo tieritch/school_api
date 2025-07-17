@@ -1,6 +1,6 @@
 const {resourceRepository}=require('../repositories');
 const {accessByToken,accessByRole}=require('../middlewares');
-const {query,body,param,validationResult}=require('express-validator');
+const {query,body,param}=require('express-validator');
 const express=require('express');
 const bcrypt=require('bcrypt');
 const router=express.Router();

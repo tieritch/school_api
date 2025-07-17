@@ -4,7 +4,7 @@ const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
 const {body,param,validationResult}=require('express-validator');
 const {asyncHandler,}=require('../utils');
 const express=require('express');
-//const { access } = require('../utils/gen_token');
+
 const router=express.Router();
 
 /**
@@ -310,13 +310,6 @@ router
    asyncHandler(async(req,res)=>{
      const {id}=req.params;
        let courseAssign=await courseAssignRepository.remove({id})
-      // .withGraphFetched('[courses,grades,schoolYears]');
-      /* courseAssign=courseAssign.map( ({id,courses,grades,schoolYears})=>({
-             id,
-             course:{id:courses.id,name:courses.name},
-             school_year:{id: schoolYears.id, name: schoolYears.name },
-             grade:{id:grades.id,name:grades.name}
-       }) )*/
        res.json(courseAssign);
    }))
  module.exports=router;

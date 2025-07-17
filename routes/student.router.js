@@ -1,7 +1,7 @@
 const {studentRepository}=require('../repositories');
 const {accessByToken,accessByRole, validateRequest}=require('../middlewares');
-const {query,body,param,validationResult}=require('express-validator');
-const {createToken,generateHexStudentNumber}=require('../utils');
+const {query,body,param}=require('express-validator');
+const {generateHexStudentNumber,asyncHandler}=require('../utils');
 const express=require('express');
 const router=express.Router();
 
@@ -97,20 +97,14 @@ router
     ],
     
     validateRequest,
-    
-    async(req,res)=>{
+
+    asyncHandler(async(req,res)=>{
+        
         req.body.student_number=await generateHexStudentNumber();
         const {firstname,lastname,student_number}=req.body;
-
-        try{
-            const student=await studentRepository.create({firstname,lastname,student_number,by:req.user.id});
-            res.json(student);
-        }
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:'Server Error'});
-        }
-    })
+        const student=await studentRepository.create({firstname,lastname,student_number,by:req.user.id});
+        res.json(student); 
+    }))
   
   /**
  * @swagger
@@ -156,18 +150,12 @@ router
    
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
 
     const {id}=req.params;
-    try{
-       const student=await studentRepository.remove({id});
-       res.json(student); 
-    }   
-    catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-    }
-  })  
+    const student=await studentRepository.remove({id});
+    res.json(student);  
+  }) ) 
 
  /**
  * @swagger
@@ -229,27 +217,19 @@ router
     
     validateRequest,
 
-    async(req,res)=>{
+    asyncHandler(async(req,res)=>{
       
         const errors=validationResult(req);
-
-        try{
-            const st=req.body;
-            let studProfile={};
-            if(st.firstname)
-                studProfile.firstname=st.firstname;
-            if(st.lastname)
-                studProfile.lastname=st.lastname;
-            studProfile.by=st.by;
-            const stud=await studentRepository.updateBy(studProfile,{student_number:st.student_number})
-            res.json(stud);
-        }
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:'Server Error'});
-        }
-    }
-)
+        const st=req.body;
+        let studProfile={};
+        if(st.firstname)
+            studProfile.firstname=st.firstname;
+        if(st.lastname)
+            studProfile.lastname=st.lastname;
+        studProfile.by=st.by;
+        const stud=await studentRepository.updateBy(studProfile,{student_number:st.student_number})
+        res.json(stud);
+    }))
 
 module.exports=router;
 
