@@ -1,7 +1,6 @@
 const {gradeRepository}=require('../repositories');
-const {accessByToken,accessByRole}=require('../middlewares');
-const {query,body,param,validationResult}=require('express-validator');
-const {createToken,}=require('../utils');
+const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
+const {query,body,param}=require('express-validator');
 const express=require('express');
 const router=express.Router();
 
@@ -12,11 +11,11 @@ const router=express.Router();
  *     Grade:
  *       type: object
  *       properties:
- *         name: 
+ *         name:
  *           type: string
  *           example: 6th grade
- *        
- *           
+ *
+ *
  */
 router
 /**
@@ -47,20 +46,20 @@ router
  *                     type: integer
  *                   name:
  *                     type: string
- *                    
- *                  
+ *
+ *
  */
-.get('/grades',accessByToken, accessByRole(['READ'],['grades']), async(req,res)=>{
+  .get('/grades',accessByToken, accessByRole(['READ'],['grades']), async(req,res)=>{
     const grades=await gradeRepository.findAll();
     res.json(grades);
-})
+  })
 
- /**
+/**
  * @swagger
  * /grades/create:
  *   post:
  *     summary: creates a grade
- *     tags: [Grades] 
+ *     tags: [Grades]
  *     requestBody:
  *       required: true
  *       content:
@@ -83,47 +82,43 @@ router
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object         
- *                          
+ *               type: object
+ *
  */
-.post('/grades/create',accessByToken, accessByRole(['READ','CREATE'],['grades']),
+  .post('/grades/create',accessByToken, accessByRole(['READ','CREATE'],['grades']),
     [
-        body('name').notEmpty().escape().trim().withMessage('grade name required')
+      body('name').notEmpty().escape().trim().withMessage('grade name required')
         .custom(async(value)=>{
-            console.log('value',value.trim())
-            const year=await gradeRepository.findBy({name:value.trim()})
-            if(year){
-                throw new Error('School year already exists')
-            }
-            return true;
-          })
+          console.log('value',value.trim());
+          const year=await gradeRepository.findBy({name:value.trim()});
+          if(year){
+            throw new Error('School year already exists');
+          }
+          return true;
+        }),
     ],
-    async(req,res)=>{
-        const {name}=req.body;
-        console.log(req.body);
 
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
-        try{
-            const grade=await gradeRepository.create({name,by:req.user.id});
-            res.json(grade);
-        }
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:'Server Error'});
-        }
+    validateRequest,
+
+    async(req,res)=>{
+      const {name}=req.body;
+      try{
+        const grade=await gradeRepository.create({name,by:req.user.id});
+        res.json(grade);
+      }
+      catch(err){
+        console.log(err.message);
+        res.status(500).json({error:'Server Error'});
+      }
     })
-  
- 
+
+
 /**
  * @swagger
  * /grades/update:
  *   put:
  *     summary: change an existing grade
- *     tags: [Grades] 
+ *     tags: [Grades]
  *     requestBody:
  *       required: true
  *       content:
@@ -148,45 +143,43 @@ router
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object 
+ *               type: object
  *       500:
  *         content:
  *           application/json:
  *             schema:
  *               type: object
- *               
- *                          
- */    
-.put('/grades/update',accessByToken, accessByRole(['READ','UPDATE'],['grades']),
+ *
+ *
+ */
+  .put('/grades/update',accessByToken, accessByRole(['READ','UPDATE'],['grades']),
     [
-        body('id').notEmpty().withMessage('grade id required')
+      body('id').notEmpty().withMessage('grade id required')
         .isInt({min:1}).withMessage('id must be a positive integer'),
-    
-        body('name').notEmpty().escape().trim().withMessage('grade name required')
-            .custom(async(value)=>{
-            const grade=await gradeRepository.findBy({name:value})
-            if(grade){
-                throw new Error('this grade already exists')
-            }
-            return true;
-        }) 
+
+      body('name').notEmpty().escape().trim().withMessage('grade name required')
+        .custom(async(value)=>{
+          const grade=await gradeRepository.findBy({name:value});
+          if(grade){
+            throw new Error('this grade already exists');
+          }
+          return true;
+        }),
     ],
+    
+    validateRequest,
+
     async(req,res)=>{
-        const {name,id}=req.body;
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
-        try{
-            const grade=await gradeRepository.updateBy({name,by:req.user.id},{id});
-            res.json(grade);
-        }
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:'Server Error'});
-        }
-})
+      const {name,id}=req.body;
+      try{
+        const grade=await gradeRepository.updateBy({name,by:req.user.id},{id});
+        res.json(grade);
+      }
+      catch(err){
+        console.log(err.message);
+        res.status(500).json({error:'Server Error'});
+      }
+    })
 
 
 /**
@@ -196,7 +189,7 @@ router
  *   delete:
  *     summary: Delete a grade
  *     description: Delete a grade by its ID
- *     tags: 
+ *     tags:
  *       - Grades
  *     parameters:
  *       - name: id
@@ -222,31 +215,28 @@ router
  *         content:
  *           application/json:
  *             schema:
- *               type: object   
- * 
+ *               type: object
+ *
  */
-.delete('/grades/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['grades']),
+  .delete('/grades/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['grades']),
     [
-        param('id').notEmpty().withMessage('grade id required').isInt({min:1})
-        .withMessage('grade id must be a positive integer')
+      param('id').notEmpty().withMessage('grade id required').isInt({min:1})
+        .withMessage('grade id must be a positive integer'),
     ],
-  async(req,res)=>{
 
-    const {id}=req.params;
-    const errors=validationResult(req);
+    validateRequest,
 
-    if(!errors.isEmpty()){
-        console.log(errors.array())
-        return res.status(400).json({ errors: errors.array() });
-    }
-    try{
-       const grade=await gradeRepository.remove({id});
-       res.json(grade); 
-    }   
-    catch(err){
+    async(req,res)=>{
+
+      const {id}=req.params;
+      try{
+        const grade=await gradeRepository.remove({id});
+        res.json(grade);
+      }
+      catch(err){
         console.log(err.message);
         res.status(500).json({error:'Server Error'});
-    }
-  })
+      }
+    });
 
 module.exports=router;

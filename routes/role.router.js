@@ -1,5 +1,5 @@
 const {roleRepository}=require('../repositories');
-const {accessByToken,accessByRole}=require('../middlewares');
+const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
 const {query,body,param,validationResult}=require('express-validator');
 const express=require('express');
 const bcrypt=require('bcrypt');
@@ -22,9 +22,6 @@ const router=express.Router();
  *         resource_ids:
  *           type: array
  *           example: [2,3]
- *         by:
- *           type: integer
- *           example: 1
  *           
  */
 
@@ -114,22 +111,17 @@ router
         body('permission_ids.*').isInt().withMessage('An integer permission ID is required'),
         body('resource_ids').isArray({min:1}).withMessage('you must at least provide one resource for this role')
      ],
-   
+    
+     validateRequest,
+     
     async(req,res)=>{
         
         req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
         req.body.resource_ids=[...new Set(req.body.resource_ids)];
         const {name,by,permission_ids,resource_ids}=req.body;
-        const errors = validationResult(req);   
-        if (!errors.isEmpty()) {
-           
-           console.log(errors.array());
-           return res.status(400).json({ errors: errors.array() });
-        
-        }
         
         try{
-            const role=await roleRepository.create({name,by,permission_ids,resource_ids});
+            const role=await roleRepository.create({name,by:req.user.id,permission_ids,resource_ids});
             console.log(role)
             res.send(role);
         }
@@ -210,20 +202,13 @@ router
 
     ],
     
+    validateRequest,
+
     async(req,res)=>{
-        console.log('req.body');
-        console.log(req.body);
-       // const {name,role_id}=req.body;
+       
         req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
         req.body.resource_ids=[...new Set(req.body.resource_ids)];
         const {name,id,by,permission_ids,resource_ids}=req.body;
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        
-        }
         try{
 
             const role=await roleRepository.updateBy(
@@ -288,16 +273,10 @@ router
              }
           })
     ], 
-     
+    
+    validateRequest,
+
     async(req,res)=>{
-       
-        console.log(req.params)
-        const errors=validationResult(req);
-        
-        if(!errors.isEmpty()){
-            console.log(errors.array());
-            return res.status(400).json({ errors: errors.array() });
-        }
 
         try{
             const user=await roleRepository.remove({id:req.params.id});

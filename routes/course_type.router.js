@@ -1,10 +1,7 @@
 const {courseTypeRepository}=require('../repositories');
-const {accessByToken,accessByRole}=require('../middlewares');
-const {query,body,param,validationResult}=require('express-validator');
-const {createToken,}=require('../utils');
+const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
+const {query,body,param}=require('express-validator');
 const express=require('express');
-const { valid } = require('joi');
-const { access } = require('../utils/gen_token');
 const router=express.Router();
 
 /**
@@ -101,14 +98,12 @@ const router=express.Router();
 
     ], 
     
+    validateRequest,
+    
     async(req,res)=>{
     
         const {name}=req.body;
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
+        
         try{
             const course=await courseTypeRepository.create({name,by:req.user.id});
             res.json(course);
@@ -179,16 +174,11 @@ const router=express.Router();
         })
     ],
     
+    validateRequest,
+
     async(req,res)=>{
         
         const {name,id}=req.body;
-
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
-
         try{
             const type=await courseTypeRepository.updateBy({name},{id});
             res.json(type);
@@ -239,13 +229,11 @@ const router=express.Router();
     param('id').notEmpty().withMessage('course type ID required').isInt({min:1})
         .withMessage('course type ID id must be a positive integer')
   ],
+
+  validateRequest,
+
   async(req,res)=>{
     const {id}=req.params;
-    
-    const errors=validationResult(req);
-    if(!errors.isEmpty()){
-        return res.status(400).json({errors:errors.array()})
-    }
 
     try{
          const type=await courseTypeRepository.remove({id});

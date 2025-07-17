@@ -1,7 +1,6 @@
 const {schoolYearRepository}=require('../repositories');
-const {accessByToken,accessByRole}=require('../middlewares');
+const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
 const {query,body,param,validationResult}=require('express-validator');
-const {createToken,}=require('../utils');
 const express=require('express');
 const router=express.Router();
 
@@ -97,13 +96,11 @@ const router=express.Router();
         return true;
       })
     ], 
+
+    validateRequest,
+    
     async(req,res)=>{
         const {name}=req.body;
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
         try{
             const schoolYear=await schoolYearRepository.create({
                 name,
@@ -173,14 +170,12 @@ const router=express.Router();
         })
     ],
     
+    validateRequest,
+
     async(req,res)=>{
         
         const {name,school_year_id}=req.body;
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
+
         try{
             const schoolYear=await schoolYearRepository.update(
                 {name},
@@ -234,18 +229,14 @@ const router=express.Router();
     [
         param('id').notEmpty().withMessage('school year id required').isInt({min:1}).withMessage('school year id must be a positive integer')
     ],
+
+    validateRequest,
+   
     async(req,res)=>{
 
-        const {id}=req.params;
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array());
-            return res.status(400).json({ errors: errors.array() });
-         }
+        const {id}=req.params;    
         try{
             const schoolYear=await schoolYearRepository.remove({id});
-            console.log('________________')
-            console.log(schoolYear);
             res.json(schoolYear);
         } 
         catch(err){

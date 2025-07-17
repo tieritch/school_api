@@ -1,8 +1,8 @@
 const {courseAssignRepository,courseRepository,
     schoolYearRepository,gradeRepository}=require('../repositories');
-const {accessByToken,accessByRole}=require('../middlewares');
+const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
 const {body,param,validationResult}=require('express-validator');
-//const {createToken,}=require('../utils');
+const {asyncHandler,}=require('../utils');
 const express=require('express');
 //const { access } = require('../utils/gen_token');
 const router=express.Router();
@@ -141,17 +141,11 @@ router
     }),
 
   ], 
-  async(req,res)=>{
+  validateRequest,
+  asyncHandler(async(req,res)=>{
      console.log('eq body,', req.body)
     const {grade_id,school_year_id,course_id}=req.body;
-    
-    const errors=validationResult(req);
-    if(!errors.isEmpty()){
-        console.log(errors.array())
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    try{
+   
         let courseAssign=await courseAssignRepository.create({grade_id,school_year_id,course_id,by:req.user.id})
                         .withGraphFetched('[courses,grades,schoolYears]');
         const {id,courses,grades,schoolYears}=courseAssign;
@@ -159,15 +153,8 @@ router
         const {id:gradeId,name:gradeName}=grades;
         const {id:yearId, name:yearName}=schoolYears;
         courseAssign={id,courses:{courseId,courseName}, grades:{gradeId,gradeName},schoolYears:{yearId,yearName}}
-        res.json(courseAssign);
-     
-    }
-    catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-    }
-
-  })
+        res.json(courseAssign);  
+  }))
 
 /**
  * @swagger
@@ -243,17 +230,12 @@ router
     }),
    ],
    
-   async(req,res)=>{
+   validateRequest,
+
+   asyncHandler(async(req,res)=>{
      
     // For a course assignment, you can change the school year (i.e., assign a different year)
      // or assign a different school class (grade) to the course.
-
-      const errors=validationResult(req);
-      if(!errors.isEmpty()){
-          console.log(errors.array())
-          return res.status(400).json({ errors: errors.array() });
-      }
-      try{
         let assign={};
         if(req.body.school_year_id){
            assign.school_year_id=req.body.school_year_id;
@@ -273,10 +255,68 @@ router
       }) )
         res.json(courseAssign);
 
-      }
-      catch(err){
-        console.log(err.message);
-        res.status(500).json({error:'Server Error'});
-      }
-   })
+   }))
+  
+   /**
+ * @swagger
+ * paths:
+ *  /course_assigns/remove/{id}:
+ *   delete:
+ *     summary: Delete a course assignment
+ *     description: Delete a course assignmentby its ID
+ *     tags: [Course-Assignments]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *       400:
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *       401:
+ *         content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *       500:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object   
+ * 
+ */
+   .delete('/course_assigns/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['course_assignments']),
+   
+   [
+      param('id').notEmpty().withMessage('course assignment ID required').isInt({min:1})
+      .withMessage('course assignment ID id must be a positive integer')
+      .custom(async(value)=>{
+         const assign=await courseAssignRepository.findBy({id:value});
+         if(!assign){
+          throw new Error(' This course assignment ID does not exist')
+         }
+      })
+   ], 
+   
+   validateRequest,
+
+   asyncHandler(async(req,res)=>{
+     const {id}=req.params;
+       let courseAssign=await courseAssignRepository.remove({id})
+      // .withGraphFetched('[courses,grades,schoolYears]');
+      /* courseAssign=courseAssign.map( ({id,courses,grades,schoolYears})=>({
+             id,
+             course:{id:courses.id,name:courses.name},
+             school_year:{id: schoolYears.id, name: schoolYears.name },
+             grade:{id:grades.id,name:grades.name}
+       }) )*/
+       res.json(courseAssign);
+   }))
  module.exports=router;

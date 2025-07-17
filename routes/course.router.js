@@ -1,9 +1,8 @@
 const {courseRepository,courseTypeRepository}=require('../repositories');
-const {accessByToken,accessByRole}=require('../middlewares');
-const {query,body,param,validationResult}=require('express-validator');
-const {createToken,}=require('../utils');
+const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
+const {query,body,param}=require('express-validator');
 const express=require('express');
-const { access } = require('../utils/gen_token');
+
 const router=express.Router();
 
 /**
@@ -13,20 +12,20 @@ const router=express.Router();
  *     Course:
  *       type: object
  *       properties:
- *         name: 
+ *         name:
  *           type: string
  *           example: Math
  *         max_score:
  *           type: integer
  *           example: 30
  *         course_type_id:
- *           type: integer 
+ *           type: integer
  *           example: 1
- *        
- *           
+ *
+ *
  */
- router
- /**
+router
+/**
   * @swagger
   * tags:
   *   name: Courses
@@ -54,30 +53,30 @@ const router=express.Router();
   *                     type: integer
   *                   name:
   *                     type: string
-  *                    
-  *                  
+  *
+  *
   */
-  .get('/courses', accessByToken, accessByRole(['READ'],['courses']), 
-     async(req,res)=>{
-         let courses=await courseTypeRepository.findAll()
-           .withGraphFetched('courses(courseInfo)')
-           .modifiers({
-            courseInfo: builder => {
-              builder.select('id','name','max_score','course_type_id');
-            }})
-         courses=courses.filter(type=>type.courses.length!=0 ).map(({name,id,courses})=>
-                     ({course_type:name.toUpperCase(),course_type_id:id,
-                        courses:courses.map(({id,name,max_score})=>({id,name,max_score}))
-                    }))
-         res.json(courses);
- })
+  .get('/courses', accessByToken, accessByRole(['READ'],['courses']),
+    async(req,res)=>{
+      let courses=await courseTypeRepository.findAll()
+        .withGraphFetched('courses(courseInfo)')
+        .modifiers({
+          courseInfo: builder => {
+            builder.select('id','name','max_score','course_type_id');
+          }});
+      courses=courses.filter(type=>type.courses.length!=0 ).map(({name,id,courses})=>
+        ({course_type:name.toUpperCase(),course_type_id:id,
+          courses:courses.map(({id,name,max_score})=>({id,name,max_score})),
+        }));
+      res.json(courses);
+    })
 
   /**
  * @swagger
  * /courses/create:
  *   post:
  *     summary: creates a course
- *     tags: [Courses] 
+ *     tags: [Courses]
  *     requestBody:
  *       required: true
  *       content:
@@ -100,59 +99,57 @@ const router=express.Router();
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object         
- *                          
+ *               type: object
+ *
  */
-.post('/courses/create',accessByToken, accessByRole(['READ','CREATE'],['courses']),
-[
-    body('name').notEmpty().withMessage('name of course required').escape()
+  .post('/courses/create',accessByToken, accessByRole(['READ','CREATE'],['courses']),
+    [
+      body('name').notEmpty().withMessage('name of course required').escape()
         .custom(async(value)=>{
-            const course=await courseRepository.findBy({name:value.trim().toLowerCase()});
-            if(course){
-                throw new Error('this course already exists')
-            }
-            return true;
-        }),
-    
-    body('max_score').notEmpty().withMessage(' max score required').isInt({min:1}).withMessage('max score must be a positive nteger'),
-
-    body('course_type_id').notEmpty().withMessage('course type ID required')
-       .isInt({min:1}).withMessage('course type ID must be a positive nteger')
-       .custom(async(value)=>{
-          const type=await courseTypeRepository.findBy({id:value});
-          console.log('type', type)
-          if(!type){
-             throw new Error(' this course type ID does not exist')
+          const course=await courseRepository.findBy({name:value.trim().toLowerCase()});
+          if(course){
+            throw new Error('this course already exists');
           }
           return true;
-       })
+        }),
 
-], 
+      body('max_score').notEmpty().withMessage(' max score required').isInt({min:1}).withMessage('max score must be a positive nteger'),
 
-async(req,res)=>{
+      body('course_type_id').notEmpty().withMessage('course type ID required')
+        .isInt({min:1}).withMessage('course type ID must be a positive nteger')
+        .custom(async(value)=>{
+          const type=await courseTypeRepository.findBy({id:value});
+          console.log('type', type);
+          if(!type){
+            throw new Error(' this course type ID does not exist');
+          }
+          return true;
+        }),
 
-    const {name,course_type_id,max_score}=req.body;
-    const errors=validationResult(req);
-    if(!errors.isEmpty()){
-        console.log(errors.array())
-        return res.status(400).json({ errors: errors.array() });
-    }
-    try{
+    ],
+
+    validateRequest,
+
+    async(req,res)=>{
+
+      const {name,course_type_id,max_score}=req.body;
+
+      try{
         const course=await courseRepository.create({name,course_type_id,max_score,by:req.user.id});
         res.json(course);
-    }
-    catch(err){
+      }
+      catch(err){
         console.log(err.message);
         res.status(500).json({error:'Server Error'});
-    }
-})
+      }
+    })
 
 /**
  * @swagger
  * /courses/update:
  *   put:
  *     summary: change an existing course
- *     tags: [Courses] 
+ *     tags: [Courses]
  *     requestBody:
  *       required: true
  *       content:
@@ -166,13 +163,13 @@ async(req,res)=>{
  *               name:
  *                 type: string
  *                 example: History
- *               max_score: 
+ *               max_score:
  *                 type: integer
- *                 example: 10 
+ *                 example: 10
  *               course_type_id:
  *                 type: integer
- *                 example: 1 
- *                
+ *                 example: 1
+ *
  *     responses:
  *       200:
  *         content:
@@ -184,76 +181,73 @@ async(req,res)=>{
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object 
+ *               type: object
  *       500:
  *         content:
  *           application/json:
  *             schema:
  *               type: object
- *               
- *                          
- */ 
-.put('/courses/update',accessByToken,accessByRole(['READ','UPDATE'],['scores']),
-   [
+ *
+ *
+ */
+  .put('/courses/update',accessByToken,accessByRole(['READ','UPDATE'],['scores']),
+    [
       body('id').notEmpty().withMessage('course ID required').isInt({min:1}).withMessage('course ID must be a positive integer')
-      .custom(async(value)=>{
+        .custom(async(value)=>{
           const course=await courseRepository.findBy({id:value});
           if(!course){
-            throw new Error('This course ID does not exist')
+            throw new Error('This course ID does not exist');
           }
           return true;
-      }),
-      
-      body('name').optional().notEmpty().withMessage('course name required').escape()
-      .custom(async(value)=>{
-        console.log('value',value)
-         const course=await courseRepository.findBy({name:value.trim().toLowerCase()});
-         if(course){
-            throw new Error('This course name already in use')
-         }
-         return true
-      }),
-      
-      body('course_type_id').optional().notEmpty().withMessage('course type ID required').isInt({min:1}).withMessage('course type ID must be a positive integer')
-      .custom(async(value)=>{
-        const type=await courseTypeRepository.findBy({id:value});
-        if(!type){
-          throw new Error('This course type does not exist')
-        }
-        return true;
-     }),
-      
-     body('max_score').optional().notEmpty().withMessage('course max_score required').isInt({min:1}).withMessage('max score must be a positive integer')
-     
-   ],
-    async(req,res)=>{
-     console.log(req.body)
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
+        }),
 
-        try{
-            let courseInfo={};
-            if(req.body.name){
-                courseInfo.name=req.body.name
-            }
-            if(req.body.course_type_id){
-                courseInfo.course_type_id=req.body.course_type_id;
-            }
-            if(req.body.max_score){
-                courseInfo.max_score=req.body.max_score
-            }
-            courseInfo.by=req.user.id;
-            const whereCondition={id:req.body.id};
-            const course=await courseRepository.updateBy(courseInfo,whereCondition);
-            res.json(course);
+      body('name').optional().notEmpty().withMessage('course name required').escape()
+        .custom(async(value)=>{
+          console.log('value',value);
+          const course=await courseRepository.findBy({name:value.trim().toLowerCase()});
+          if(course){
+            throw new Error('This course name already in use');
+          }
+          return true;
+        }),
+
+      body('course_type_id').optional().notEmpty().withMessage('course type ID required').isInt({min:1}).withMessage('course type ID must be a positive integer')
+        .custom(async(value)=>{
+          const type=await courseTypeRepository.findBy({id:value});
+          if(!type){
+            throw new Error('This course type does not exist');
+          }
+          return true;
+        }),
+
+      body('max_score').optional().notEmpty().withMessage('course max_score required').isInt({min:1}).withMessage('max score must be a positive integer'),
+
+    ],
+
+    validateRequest,
+
+    async(req,res)=>{
+
+      try{
+        const courseInfo={};
+        if(req.body.name){
+          courseInfo.name=req.body.name;
         }
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:'Server Error'}); 
+        if(req.body.course_type_id){
+          courseInfo.course_type_id=req.body.course_type_id;
         }
+        if(req.body.max_score){
+          courseInfo.max_score=req.body.max_score;
+        }
+        courseInfo.by=req.user.id;
+        const whereCondition={id:req.body.id};
+        const course=await courseRepository.updateBy(courseInfo,whereCondition);
+        res.json(course);
+      }
+      catch(err){
+        console.log(err.message);
+        res.status(500).json({error:'Server Error'});
+      }
     })
 
 /**
@@ -288,39 +282,35 @@ async(req,res)=>{
  *         content:
  *           application/json:
  *             schema:
- *               type: object   
- * 
+ *               type: object
+ *
  */
-.delete('/courses/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['courses']),
+  .delete('/courses/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['courses']),
     [
-        param('id').notEmpty().withMessage('course ID required').isInt({min:1}).withMessage('courseID must be a positive integer')
-         .custom(async(value)=>{
-            const course=await courseRepository.findBy({id:value});
-            if(!course){
-                throw new Error(' this course ID does not exist')
-            }
-            return true;
-         })
-        
+      param('id').notEmpty().withMessage('course ID required').isInt({min:1}).withMessage('courseID must be a positive integer')
+        .custom(async(value)=>{
+          const course=await courseRepository.findBy({id:value});
+          if(!course){
+            throw new Error(' this course ID does not exist');
+          }
+          return true;
+        }),
+
     ],
-    
+
+    validateRequest,
+
     async(req,res)=>{
-      console.log(req.params)
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
 
-        try{
-             const {id}=req.params;
-             const course=await courseRepository.remove({id});
-             res.json(course);
-        }
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:'Server Error'}); 
-        }
-    })    
+      try{
+        const {id}=req.params;
+        const course=await courseRepository.remove({id});
+        res.json(course);
+      }
+      catch(err){
+        console.log(err.message);
+        res.status(500).json({error:'Server Error'});
+      }
+    });
 
- module.exports=router;
+module.exports=router;

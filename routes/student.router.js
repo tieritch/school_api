@@ -1,5 +1,5 @@
 const {studentRepository}=require('../repositories');
-const {accessByToken,accessByRole}=require('../middlewares');
+const {accessByToken,accessByRole, validateRequest}=require('../middlewares');
 const {query,body,param,validationResult}=require('express-validator');
 const {createToken,generateHexStudentNumber}=require('../utils');
 const express=require('express');
@@ -16,8 +16,6 @@ const router=express.Router();
  *           type: string
  *         lastname:
  *           type: string
- *         by:
- *           type: integer
  *        
  *           
  */
@@ -98,16 +96,12 @@ router
         body('lastname').notEmpty().escape().trim().withMessage('last name required'), 
     ],
     
+    validateRequest,
+    
     async(req,res)=>{
         req.body.student_number=await generateHexStudentNumber();
         const {firstname,lastname,student_number}=req.body;
-        console.log(req.body);
 
-        const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
         try{
             const student=await studentRepository.create({firstname,lastname,student_number,by:req.user.id});
             res.json(student);
@@ -159,15 +153,12 @@ router
         param('id').notEmpty().withMessage('student id required').isInt({min:1})
         .withMessage('student id must be a positive integer')
     ],
-  async(req,res)=>{
+   
+    validateRequest,
+
+    async(req,res)=>{
 
     const {id}=req.params;
-    const errors=validationResult(req);
-
-    if(!errors.isEmpty()){
-        console.log(errors.array())
-        return res.status(400).json({ errors: errors.array() });
-    }
     try{
        const student=await studentRepository.remove({id});
        res.json(student); 
@@ -198,8 +189,6 @@ router
  *                 type: string
  *               lastname:
  *                 type: string
- *               by: 
- *                 type: integer
  *     responses:
  *       200 :
  *         content:
@@ -237,13 +226,13 @@ router
             .notEmpty().withMessage('Last name cannot be empty'),
 
     ],
+    
+    validateRequest,
+
     async(req,res)=>{
       
         const errors=validationResult(req);
-        if(!errors.isEmpty()){
-            console.log(errors.array())
-            return res.status(400).json({ errors: errors.array() });
-        }
+
         try{
             const st=req.body;
             let studProfile={};
