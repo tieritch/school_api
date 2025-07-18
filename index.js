@@ -24,6 +24,7 @@ app.use(require('./routes/enrollment.router'));
 app.use(require('./routes/course_type.router'));
 app.use(require('./routes/course.router'));
 app.use(require('./routes/course_assign.router'));
+app.use(require('./routes/evaluation_type.router'));
 
 // error middleware 
 app.use((err, req, res, next) => {
