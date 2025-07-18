@@ -12,6 +12,7 @@ const Course=require('./course');
 const StudentSequence=require('./stud_seq');
 const CourseAssign=require('./course_assign');
 const EvaluationType=require('./evaluation_type');
+const Score=require('./score');
 module.exports={
     Role,
     User,
@@ -26,5 +27,6 @@ module.exports={
     Course,
     StudentSequence,
     CourseAssign,
-    EvaluationType
+    EvaluationType,
+    Score
 }
