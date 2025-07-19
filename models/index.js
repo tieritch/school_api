@@ -15,7 +15,6 @@ const EvaluationType=require('./evaluation_type');
 const Score=require('./score');
 const AcademicSubdivision=require('./academic_subdivision');
 const AcademicPeriod=require('./academic_period');
-const AcademicPeriod = require('./academic_period');
 module.exports={
     Role,
     User,
