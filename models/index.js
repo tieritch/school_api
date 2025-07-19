@@ -14,6 +14,8 @@ const CourseAssign=require('./course_assign');
 const EvaluationType=require('./evaluation_type');
 const Score=require('./score');
 const AcademicSubdivision=require('./academic_subdivision');
+const AcademicPeriod=require('./academic_period');
+const academicPeriod = require('./academic_period');
 module.exports={
     Role,
     User,
@@ -30,5 +32,6 @@ module.exports={
     CourseAssign,
     EvaluationType,
     Score,
-    AcademicSubdivision
+    AcademicSubdivision,
+    academicPeriod
 }
