@@ -13,6 +13,7 @@ const courseRepository=require('./course.repository');
 const courseAssignRepository=require('./course_assign.repository');
 const evaluationTypeRepository=require('./evaluation_type.repository');
 const scoreRepository=require('./score.repository');
+const academicSubdivisionRepository=require('./academic_subdivision.repository');
 module.exports={
     userRepository,
     roleRepository,
@@ -28,5 +29,6 @@ module.exports={
     courseRepository,
     courseAssignRepository,
     evaluationTypeRepository,
-    scoreRepository
+    scoreRepository,
+    academicSubdivisionRepository
 }
