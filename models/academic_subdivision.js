@@ -23,7 +23,7 @@ module.exports=class AcademicSubdivision extends Model{
                 modelClass:path.join(__dirname,'academic_period'),
                 join:{
                     from:'academic_subdivisions.id',
-                    to:'academic_periods.academic_subdivison_id'
+                    to:'academic_periods.academic_subdivision_id'
                 }
             }
         } 
