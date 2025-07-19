@@ -2,7 +2,7 @@ const{Model}=require('objection');
 const path=require('path');
 const AcademicSubdivision = require('./academic_subdivision');
 
-module.exports=class academicPeriod extends Model{
+module.exports=class AcademicPeriod extends Model{
 
     static get tableName(){
         return 'academic_periods'
@@ -16,6 +16,14 @@ module.exports=class academicPeriod extends Model{
                 join:{
                     from:'academic_periods.academic_subdivision_id',
                     to:'academic_subdivisions.id'
+                }
+            },
+            scores:{
+                relation: Model.HasManyRelation,
+                modelClass:path.join(__dirname,'score'),
+                join:{
+                    from:'academic_periods.id',
+                    to:'scores.academic_period_id'
                 }
             }
         }
