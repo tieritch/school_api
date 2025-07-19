@@ -113,9 +113,10 @@ router
           }
         // check if a course is alredy assigned to the same school year and the same grade
           const repoAssign=await courseAssignRepository.findBy({
-            id:value,
+            course_id:value,
             school_year_id:req.body.school_year_id,
             grade_id:req.body.grade_id})
+            
           if(repoAssign){
             throw new Error(' the course is already assigned to the same school year and grade ')
           }   
