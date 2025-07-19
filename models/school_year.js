@@ -41,6 +41,14 @@ module.exports=class SchoolYear extends Model {
           },
           to: 'grades.id',
         },
+      },
+      subdivisions:{
+        relation:Model.HasOneRelation,
+        modelClass: path.join(__dirname,'academic_subdivision'),
+        join:{
+          from:'school_years.id',
+          to:'academic_subdivisions.school_year_id'
+        }
       }
     };
   }
