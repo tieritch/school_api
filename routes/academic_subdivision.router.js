@@ -142,7 +142,7 @@ const router=express.Router();
  *                 example: 1
  *               name:
  *                 type: string
- *                 example: History
+ *                 example: semester
  *               number_of_periods:
  *                 type: integer
  *                 example: 2
