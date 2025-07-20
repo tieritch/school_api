@@ -20,6 +20,7 @@ app.use(require('./routes/school_year.router'));
 app.use(require('./routes/grade.router'));
 app.use(require('./routes/student.router'));
 app.use(require('./routes/academic_subdivision.router'));
+app.use(require('./routes/academic_period.router'));
 app.use(require('./routes/resource.router'));
 app.use(require('./routes/enrollment.router'));
 app.use(require('./routes/course_type.router'));
