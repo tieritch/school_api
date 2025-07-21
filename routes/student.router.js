@@ -195,7 +195,7 @@ router
  *               type: object
  *                
  */ 
-.patch('/students/by_admin',accessByToken,accessByRole(['READ','UPDATE'],['students']),
+.patch('/students/update',accessByToken,accessByRole(['READ','UPDATE'],['students']),
     [
         body('student_number').notEmpty().withMessage('student_number required')
             .custom( async(value)=>{
