@@ -9,7 +9,7 @@ module.exports= class Score extends Model{
         return {
             courseAssigns:{
                 relation:Model.BelongsToOneRelation,
-                modelClass: path.join(__dirname,'course_assignments'),
+                modelClass: path.join(__dirname,'course_assignment'),
                 join:{
                     from: 'scores.course_assignment_id',
                     to:'course_assignments.id'
@@ -25,10 +25,18 @@ module.exports= class Score extends Model{
             },
             evaluationTypes:{
                 relation: Model.BelongsToOneRelation,
-                modelClass:path.join(__dirname,'evaluation_types'),
+                modelClass:path.join(__dirname,'evaluation_type'),
                 join:{
                     from: 'scores.evaluation_type_id',
                     to:'evaluation_types.id'
+                }
+            },
+            academicPeriods:{
+                relation: Model.BelongsToOneRelation,
+                modelClass:path.join(__dirname,'academic_period'),
+                join:{
+                    from:'scores.academic_period_id',
+                    to:'academic_periods.id'
                 }
             }
         }
