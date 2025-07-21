@@ -7,7 +7,7 @@ const swaggerDef=require('../docs/swagger_def');
 const options={
   swaggerDefinition:swaggerDef,
   apis:['./routes/*.js'],
-}
+};
 const express=require('express');
 const router=express.Router();
 const swaggerSpec=swaggerJsDoc(options);

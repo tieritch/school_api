@@ -47,17 +47,17 @@ module.exports=class SchoolYear extends Model {
         modelClass: path.join(__dirname,'academic_subdivision'),
         join:{
           from:'school_years.id',
-          to:'academic_subdivisions.school_year_id'
-        }
-      }
+          to:'academic_subdivisions.school_year_id',
+        },
+      },
     };
   }
-  
+
   $beforeInsert(){
     this.name=this.name.toLowerCase().trim();
   }
   $beforeUpdate(){
     this.name=this.name.toLowerCase().trim();
   }
-}
+};
 

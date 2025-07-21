@@ -15,7 +15,7 @@ const router=express.Router();
  *     Role:
  *       type: object
  *       properties:
- *         name: 
+ *         name:
  *           type: string
  *         permission_ids:
  *           type: array
@@ -23,10 +23,10 @@ const router=express.Router();
  *         resource_ids:
  *           type: array
  *           example: [2,3]
- *           
+ *
  */
 
- /**
+/**
  * @swagger
  * tags:
  *   name: Roles
@@ -56,22 +56,22 @@ router
  *                   name:
  *                     type: string
  *                     description: Role's name
- * 
- *                  
+ *
+ *
  */
-.get('/roles',accessByToken,accessByRole(['READ'],['roles']),
-  async(req,res)=>{
-    const roles=await roleRepository.findAll();
-    console.log(roles);
-    res.json(roles);
-})
+  .get('/roles',accessByToken,accessByRole(['READ'],['roles']),
+    async(req,res)=>{
+      const roles=await roleRepository.findAll();
+      console.log(roles);
+      res.json(roles);
+    })
 
 /**
  * @swagger
  * /roles/create:
  *   post:
  *     summary: creates a role
- *     tags: [Roles] 
+ *     tags: [Roles]
  *     requestBody:
  *       required: true
  *       content:
@@ -90,40 +90,40 @@ router
  *           applicaction/json:
  *             schema:
  *               type: object
- *               
- *                          
+ *
+ *
  */
-.post('/roles/create',
-    
+  .post('/roles/create',
+
     accessByToken, accessByRole(['READ','CREATE'],['roles']),
-    
+
     [
-        body('name').notEmpty().escape().trim().withMessage('role name required')
+      body('name').notEmpty().escape().trim().withMessage('role name required')
         .custom(async(value)=>{
-            const role=await roleRepository.findBy({name:value.toLowerCase()})
-            console.log("role",role)
-            if (role) {
-                throw new Error('Role already exists');
-            };
-            return true;
+          const role=await roleRepository.findBy({name:value.toLowerCase()});
+          console.log("role",role);
+          if (role) {
+            throw new Error('Role already exists');
+          };
+          return true;
         } ),
-        
-        body('permission_ids').isArray({min:1}).withMessage('you must at least provide one permission for this role'),
-        body('permission_ids.*').isInt().withMessage('An integer permission ID is required'),
-        body('resource_ids').isArray({min:1}).withMessage('you must at least provide one resource for this role')
-     ],
-    
+
+      body('permission_ids').isArray({min:1}).withMessage('you must at least provide one permission for this role'),
+      body('permission_ids.*').isInt().withMessage('An integer permission ID is required'),
+      body('resource_ids').isArray({min:1}).withMessage('you must at least provide one resource for this role'),
+    ],
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-        
-        req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
-        req.body.resource_ids=[...new Set(req.body.resource_ids)];
-        const {name,by,permission_ids,resource_ids}=req.body;
-    
-        const role=await roleRepository.create({name,by:req.user.id,permission_ids,resource_ids});
-        res.send(role)      
-  }))
+
+      req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
+      req.body.resource_ids=[...new Set(req.body.resource_ids)];
+      const {name,by,permission_ids,resource_ids}=req.body;
+
+      const role=await roleRepository.create({name,by:req.user.id,permission_ids,resource_ids});
+      res.send(role);
+    }))
 
 
 /**
@@ -131,7 +131,7 @@ router
  * /roles/update:
  *   patch:
  *     summary: change an existing role
- *     tags: [Roles] 
+ *     tags: [Roles]
  *     requestBody:
  *       required: true
  *       content:
@@ -161,52 +161,52 @@ router
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object 
+ *               type: object
  *       500:
  *         content:
  *           application/json:
  *             schema:
  *               type: object
- *               
- *                          
+ *
+ *
  */
-.patch('/roles/update', accessByToken,accessByRole(['UPDATE','READ'],['roles']), 
-    
-   [
-     
-    body('id').notEmpty().withMessage('role id required').isInt().withMessage(' role id required as integer type')
-    .custom(async(value)=>{        
-         const role=await roleRepository.findBy({id:value})
-         if (role && role.name=='admin') {
-             throw new Error('This role is protected');
-         }
-     } ),
+  .patch('/roles/update', accessByToken,accessByRole(['UPDATE','READ'],['roles']),
 
-    body('name').notEmpty().withMessage('role name required')
-    .custom(async(value)=>{
-        const role=await roleRepository.findBy({name:value.trim().toLowerCase()})
-        if (role && parseInt(role.id)==value.id) {
+    [
+
+      body('id').notEmpty().withMessage('role id required').isInt().withMessage(' role id required as integer type')
+        .custom(async(value)=>{
+          const role=await roleRepository.findBy({id:value});
+          if (role && role.name=='admin') {
+            throw new Error('This role is protected');
+          }
+        } ),
+
+      body('name').notEmpty().withMessage('role name required')
+        .custom(async(value)=>{
+          const role=await roleRepository.findBy({name:value.trim().toLowerCase()});
+          if (role && parseInt(role.id)==value.id) {
             throw new Error('Role already exists');
-        }
-    } ),
-    body('permission_ids.*').isInt().withMessage('An integer permission ID is required'),
-    body('resource_ids.*').isInt().withMessage('An integer resource ID is required')
+          }
+        } ),
+      body('permission_ids.*').isInt().withMessage('An integer permission ID is required'),
+      body('resource_ids.*').isInt().withMessage('An integer resource ID is required'),
 
     ],
-    
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-       
-        req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
-        req.body.resource_ids=[...new Set(req.body.resource_ids)];
-        const {name,id,by,permission_ids,resource_ids}=req.body;
-        const role=await roleRepository.updateBy(
-            {name,permission_ids,resource_ids,role_id:id},
-            {id}
-        );
-       res.json(role);
-}))
+
+      req.body.permission_ids=[...new Set(req.body.permission_ids)]; // to avoid duplicates
+      req.body.resource_ids=[...new Set(req.body.resource_ids)];
+      const {name,id,by,permission_ids,resource_ids}=req.body;
+      const role=await roleRepository.updateBy(
+        {name,permission_ids,resource_ids,role_id:id},
+        {id},
+      );
+      res.json(role);
+    }))
 
 /**
  * @swagger
@@ -215,7 +215,7 @@ router
  *   delete:
  *     summary: Delete user
  *     description: Delete a user by his ID
- *     tags: 
+ *     tags:
  *       - Roles
  *     parameters:
  *       - name: id
@@ -241,26 +241,26 @@ router
  *         content:
  *           application/json:
  *             schema:
- *               type: object   
- * 
+ *               type: object
+ *
  */
-.delete('/roles/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['roles']),
-    
+  .delete('/roles/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['roles']),
+
     [
-        param('id').notEmpty().withMessage('role id required').isInt().withMessage('role id required as integer type')
-          .custom(async(value)=>{
-             const role=await roleRepository.findBy({id:value});
-             if(role && role.name=='admin'){
-                throw new Error('this role is protected');
-             }
-          })
-    ], 
-    
+      param('id').notEmpty().withMessage('role id required').isInt().withMessage('role id required as integer type')
+        .custom(async(value)=>{
+          const role=await roleRepository.findBy({id:value});
+          if(role && role.name=='admin'){
+            throw new Error('this role is protected');
+          }
+        }),
+    ],
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
 
-    const user=await roleRepository.remove({id:req.params.id});
-    res.json(user);
-}))
+      const user=await roleRepository.remove({id:req.params.id});
+      res.json(user);
+    }));
 module.exports=router;

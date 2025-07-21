@@ -12,12 +12,12 @@ const router=express.Router();
  *     Student:
  *       type: object
  *       properties:
- *         firstname: 
+ *         firstname:
  *           type: string
  *         lastname:
  *           type: string
- *        
- *           
+ *
+ *
  */
 router
 /**
@@ -49,21 +49,21 @@ router
  *                     type: string
  *                   lastname:
  *                     type: string
- *                    
- *                  
+ *
+ *
  */
-.get('/students',accessByToken, async(req,res)=>{
+  .get('/students',accessByToken, async(req,res)=>{
     const students=await studentRepository.findAll();
     console.log(students);
     res.json(students);
-})
+  })
 
- /**
+/**
  * @swagger
  * /students/create:
  *   post:
  *     summary: register a student
- *     tags: [Students] 
+ *     tags: [Students]
  *     requestBody:
  *       required: true
  *       content:
@@ -86,26 +86,26 @@ router
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object         
- *                          
+ *               type: object
+ *
  */
- .post('/students/create',accessByToken, accessByRole(['READ','CREATE'],['students']),
-    
+  .post('/students/create',accessByToken, accessByRole(['READ','CREATE'],['students']),
+
     [
-        body('firstname').notEmpty().escape().trim().withMessage('first name required'),
-        body('lastname').notEmpty().escape().trim().withMessage('last name required'), 
+      body('firstname').notEmpty().escape().trim().withMessage('first name required'),
+      body('lastname').notEmpty().escape().trim().withMessage('last name required'),
     ],
-    
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-        
-        req.body.student_number=await generateHexStudentNumber();
-        const {firstname,lastname,student_number}=req.body;
-        const student=await studentRepository.create({firstname,lastname,student_number,by:req.user.id});
-        res.json(student); 
+
+      req.body.student_number=await generateHexStudentNumber();
+      const {firstname,lastname,student_number}=req.body;
+      const student=await studentRepository.create({firstname,lastname,student_number,by:req.user.id});
+      res.json(student);
     }))
-  
+
   /**
  * @swagger
  * paths:
@@ -113,7 +113,7 @@ router
  *   delete:
  *     summary: Delete a student
  *     description: Delete a student by his ID
- *     tags: 
+ *     tags:
  *       - Students
  *     parameters:
  *       - name: id
@@ -139,25 +139,25 @@ router
  *         content:
  *           application/json:
  *             schema:
- *               type: object   
- * 
+ *               type: object
+ *
  */
-.delete('/students/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['students']),
+  .delete('/students/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['students']),
     [
-        param('id').notEmpty().withMessage('student id required').isInt({min:1})
-        .withMessage('student id must be a positive integer')
+      param('id').notEmpty().withMessage('student id required').isInt({min:1})
+        .withMessage('student id must be a positive integer'),
     ],
-   
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
 
-    const {id}=req.params;
-    const student=await studentRepository.remove({id});
-    res.json(student);  
-  }) ) 
+      const {id}=req.params;
+      const student=await studentRepository.remove({id});
+      res.json(student);
+    }) )
 
- /**
+/**
  * @swagger
  * /students/by_admin:
  *   patch:
@@ -193,43 +193,43 @@ router
  *           application/json:
  *             schema:
  *               type: object
- *                
- */ 
-.patch('/students/update',accessByToken,accessByRole(['READ','UPDATE'],['students']),
+ *
+ */
+  .patch('/students/update',accessByToken,accessByRole(['READ','UPDATE'],['students']),
     [
-        body('student_number').notEmpty().withMessage('student_number required')
-            .custom( async(value)=>{
-                const student=await studentRepository.findBy({student_number:value.trim().toUpperCase()})
-                if (!student) {
-                   throw new Error('Student does not exist');
-                 }
-                 return true;
-             }),
+      body('student_number').notEmpty().withMessage('student_number required')
+        .custom( async(value)=>{
+          const student=await studentRepository.findBy({student_number:value.trim().toUpperCase()});
+          if (!student) {
+            throw new Error('Student does not exist');
+          }
+          return true;
+        }),
 
-        body('firstname')
-            .optional().escape().trim()
-            .notEmpty().withMessage('First name cannot be empty'),
-  
-        body('lastname').optional().escape().trim()
-            .notEmpty().withMessage('Last name cannot be empty'),
+      body('firstname')
+        .optional().escape().trim()
+        .notEmpty().withMessage('First name cannot be empty'),
+
+      body('lastname').optional().escape().trim()
+        .notEmpty().withMessage('Last name cannot be empty'),
 
     ],
-    
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-      
-        const errors=validationResult(req);
-        const st=req.body;
-        let studProfile={};
-        if(st.firstname)
-            studProfile.firstname=st.firstname;
-        if(st.lastname)
-            studProfile.lastname=st.lastname;
-        studProfile.by=st.by;
-        const stud=await studentRepository.updateBy(studProfile,{student_number:st.student_number})
-        res.json(stud);
-    }))
+
+      const errors=validationResult(req);
+      const st=req.body;
+      const studProfile={};
+      if(st.firstname)
+      {studProfile.firstname=st.firstname;}
+      if(st.lastname)
+      {studProfile.lastname=st.lastname;}
+      studProfile.by=st.by;
+      const stud=await studentRepository.updateBy(studProfile,{student_number:st.student_number});
+      res.json(stud);
+    }));
 
 module.exports=router;
 

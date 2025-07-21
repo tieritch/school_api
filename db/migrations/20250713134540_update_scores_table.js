@@ -3,10 +3,10 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
-    return knex.schema.alterTable('scores',(table)=>{
-        table.dropColumn('course_id');
-        table.integer('course_assignment_id').references('id').inTable('course_assignments').notNullable();
-    })
+  return knex.schema.alterTable('scores',(table)=>{
+    table.dropColumn('course_id');
+    table.integer('course_assignment_id').references('id').inTable('course_assignments').notNullable();
+  });
 };
 
 /**
@@ -14,8 +14,8 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-    return knex.schema.alterTable('scores',(table)=>{
-        table.dropColumn('course_assignment_id');
-    })
-  
+  return knex.schema.alterTable('scores',(table)=>{
+    table.dropColumn('course_assignment_id');
+  });
+
 };

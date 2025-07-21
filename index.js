@@ -29,12 +29,12 @@ app.use(require('./routes/score.router'));
 app.use(require('./routes/course_assign.router'));
 app.use(require('./routes/evaluation_type.router'));
 
-// error middleware 
+// error middleware
 app.use((err, req, res, next) => {
-  
+
   console.error(err.message);
   const status = err.status || 500;
-  
+
   // If it's a validation error
   if (err.details) {
     return res.status(status).json({

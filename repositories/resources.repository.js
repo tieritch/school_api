@@ -4,28 +4,28 @@ const {Resource}=require('../models');
  */
 
 const resourceRepository={
-     
-    /**
+
+  /**
       * This function returns list of all resources
-      * @function 
+      * @function
       * @memberof resourceRepository
       * @returns {Array}
       */
-     findAll(){
-        return Resource.query();
-     },
+  findAll(){
+    return Resource.query();
+  },
 
-      /**
+  /**
       * This function returns one resource based on informations provided by entity object
       * @function
       * @memberof resourceRepository
-      * @param {object} entity 
+      * @param {object} entity
       * @returns { object}
       */
-    async findBy(entity){
-        const resource=await Resource.query().where(entity).first();
-        return resource;
-    },
+  async findBy(entity){
+    const resource=await Resource.query().where(entity).first();
+    return resource;
+  },
 
-}
-module.exports=resourceRepository
+};
+module.exports=resourceRepository;

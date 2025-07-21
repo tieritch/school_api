@@ -173,15 +173,15 @@ router
     asyncHandler(async(req,res)=>{
 
       const {firstname,lastname,email,password,username,role_id}=req.body;
-     
+
       const user=await userRepository.create({
-          firstname,
-          lastname,
-          email,
-          password:await bcrypt.hash(password,10),
-          username,
-          role_id});
-        res.send(user);
+        firstname,
+        lastname,
+        email,
+        password:await bcrypt.hash(password,10),
+        username,
+        role_id});
+      res.send(user);
     }))
 
 
@@ -235,7 +235,7 @@ router
 
   async(req,res)=>{
 
-    const user=await userRepository.findBy({username:req.body.username})
+    const user=await userRepository.findBy({username:req.body.username});
     const accessToken=createToken.access(user.toJSON());
     const refreshToken=createToken.refresh(user.toJSON());
     await refreshTokenRepository.create({
@@ -299,17 +299,17 @@ router
       body('id').notEmpty().withMessage(' user id required').isInt().withMessage(' required user id as integer type'),
     ],
     validateRequest,
-    
+
     asyncHandler(async(req,res)=>{
 
       const { id}=req.body;
-      const {refreshToken,accessToken}=req.cookies;  
-       
+      const {refreshToken,accessToken}=req.cookies;
+
       await refreshTokenRepository.remove({user_id:id});
       res.clearCookie('accessToken');
       res.clearCookie('refreshToken');
       res.json({success:'successful logout'});
-      
+
     }))
 
 /**
@@ -356,20 +356,20 @@ router
       body('user_id').notEmpty().withMessage('user id required').isInt().withMessage('user id required as integer type'),
       body('role_id').notEmpty().withMessage('role id required').isInt().withMessage('role id required as integer type'),
     ],
-   
+
     validateRequest,
-   
+
     asyncHandler(async(req,res)=>{
 
       const {user_id,role_id}=req.body;
       const user=await userRepository.updateBy(
-      {
-         role_id,by:req.user.id,
-      },{
-         user_id,
-      });
+        {
+          role_id,by:req.user.id,
+        },{
+          user_id,
+        });
       res.json(user);
-      }   
+    },
     ))
 
 /**
@@ -506,9 +506,9 @@ router
 
       const userUpd = await userRepository.updateBy(userProfile, whereCondition);
       return res.json(userUpd);
-      }
-    ,
-  ))
+    }
+      ,
+    ))
 
 /**
  * @swagger
@@ -550,18 +550,18 @@ router
     [
       param('id').notEmpty().withMessage('user id required').isInt().withMessage('user id require as integer type'),
     ],
-    
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
       const {id}=req.params;
-    
-        const admin=await userRepository.findBy({id,username:'admin'});
-        // we don't delete the default admin use (whose username is admin);
-        if(!admin){
-          const user=await userRepository.remove({id});
-          console.log('deleted user:',user);
-          res.json(user);
-        }
+
+      const admin=await userRepository.findBy({id,username:'admin'});
+      // we don't delete the default admin user (whose username is admin);
+      if(!admin){
+        const user=await userRepository.remove({id});
+        console.log('deleted user:',user);
+        res.json(user);
+      }
     }));
 module.exports=router;

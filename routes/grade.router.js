@@ -101,9 +101,9 @@ router
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-        const {name}=req.body;
-        const grade=await gradeRepository.create({name,by:req.user.id});
-        res.json(grade);
+      const {name}=req.body;
+      const grade=await gradeRepository.create({name,by:req.user.id});
+      res.json(grade);
     }))
 
 
@@ -160,13 +160,13 @@ router
           return true;
         }),
     ],
-    
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-        const {name,id}=req.body;
-        const grade=await gradeRepository.updateBy({name,by:req.user.id},{id});
-        res.json(grade);
+      const {name,id}=req.body;
+      const grade=await gradeRepository.updateBy({name,by:req.user.id},{id});
+      res.json(grade);
     }))
 
 
@@ -216,9 +216,9 @@ router
 
     asyncHandler(async(req,res)=>{
 
-        const {id}=req.params;
-        const grade=await gradeRepository.remove({id});
-        res.json(grade);
+      const {id}=req.params;
+      const grade=await gradeRepository.remove({id});
+      res.json(grade);
     }));
 
 module.exports=router;

@@ -41,7 +41,7 @@ module.exports=class Grade extends Model {
           },
           to: 'school_years.id',
         },
-      }
+      },
     };
   }
   $beforeInsert(){
@@ -50,5 +50,5 @@ module.exports=class Grade extends Model {
   $beforeUpdate(){
     this.name=this.name.trim();
   }
-}
+};
 

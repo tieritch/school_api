@@ -3,13 +3,13 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
-    return knex.schema
+  return knex.schema
     .alterTable('academic_subdivisions',(table)=>{
-        table.integer('by').notNullable();
+      table.integer('by').notNullable();
     })
     .alterTable('academic_periods', (table)=>{
-        table.integer('by').notNullable();
-    })
+      table.integer('by').notNullable();
+    });
 };
 
 /**
@@ -17,11 +17,11 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-    return knex.schema
+  return knex.schema
     .alterTable('academic_subdivisions',(table)=>{
-        table.dropColumn('by');
+      table.dropColumn('by');
     })
     .alterTable('academic_periods',(table)=>{
-        table.dropColumn('by');
-    })
+      table.dropColumn('by');
+    });
 };

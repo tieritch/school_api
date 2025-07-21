@@ -1,28 +1,28 @@
 const {Model}=require('objection');
 //const Role=require('./role');
 const bcrypt=require('bcrypt');
-const path=require('path')
+const path=require('path');
 module.exports=class User extends Model {
-   static get tableName(){  
-        return 'users'
-   };
-   static get relationMappings(){
-        return {
-            roles:{
-                relation:Model.ManyToManyRelation,
-                modelClass:path.join(__dirname,'role'),
-                join:{
-                    from:'users.id',
-                        through:{
-                            from:'users_roles.user_id',
-                            to:'users_roles.role_id'     
-                    },
-                    to:'roles.id'
-                }
-            },
-        }
-   }
-   /*static get jsonSchema(){
+  static get tableName(){
+    return 'users';
+  };
+  static get relationMappings(){
+    return {
+      roles:{
+        relation:Model.ManyToManyRelation,
+        modelClass:path.join(__dirname,'role'),
+        join:{
+          from:'users.id',
+          through:{
+            from:'users_roles.user_id',
+            to:'users_roles.role_id',
+          },
+          to:'roles.id',
+        },
+      },
+    };
+  }
+  /*static get jsonSchema(){
        // console.log('firstname:'+this.firstname)
       //  console.log('lasttname:'+this.lastname)
        // console.log('email:'+this.email)
@@ -37,15 +37,15 @@ module.exports=class User extends Model {
                 lastname:{type:'string', minLength:2},
                 //phone:{type:'string'},
                 password:{
-                    type:'string', 
+                    type:'string',
                     pattern:'^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)', //chiffre, majuscule,muniscule
                     minLength:8
                 },
                 newPassword:{
-                    type:'string', 
+                    type:'string',
                     pattern:'^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)', //chiffre, majuscule,muniscule
                     minLength:8
-                }                         
+                }
             },
         }
     }
@@ -66,15 +66,15 @@ module.exports=class User extends Model {
         return parsed
     }
     */
-   $beforeInsert(){
-        this.username=this.username.trim();
-        this.email=this.email.trim().toLowerCase();
-        this.password=this.password.trim();
-   }
-   $beforeUpdate(){
-       if(this.email)
-        this.email=this.email.trim().toLowerCase();
-       if(this.password)
-        this.password=this.password.trim();
-   }
-}
+  $beforeInsert(){
+    this.username=this.username.trim();
+    this.email=this.email.trim().toLowerCase();
+    this.password=this.password.trim();
+  }
+  $beforeUpdate(){
+    if(this.email)
+    {this.email=this.email.trim().toLowerCase();}
+    if(this.password)
+    {this.password=this.password.trim();}
+  }
+};

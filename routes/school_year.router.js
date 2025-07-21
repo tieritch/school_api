@@ -11,22 +11,22 @@ const router=express.Router();
  *     SchoolYear:
  *       type: object
  *       properties:
- *         name: 
+ *         name:
  *           type: string
- *        
- *           
+ *
+ *
  */
 
- router
+router
 
- /**
+/**
   * @swagger
   * tags:
   *   name: School-Years
   *   description: School year management endpoints
   */
 
- /**
+/**
  * @swagger
  * /school_years:
  *   get:
@@ -45,21 +45,21 @@ const router=express.Router();
  *                   id:
  *                     type: integer
  *                     description: The school year ID
- *                  
- *                  
+ *
+ *
  */
- .get('/school_years', async(req,res)=>{
+  .get('/school_years', async(req,res)=>{
     const years=await schoolYearRepository.findAll();
     console.log(years);
     res.json(years);
- })
+  })
 
- /**
+/**
  * @swagger
  * /school_years/create:
  *   post:
  *     summary: creates a school year
- *     tags: [School-Years] 
+ *     tags: [School-Years]
  *     requestBody:
  *       required: true
  *       content:
@@ -82,44 +82,44 @@ const router=express.Router();
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object         
- *                          
+ *               type: object
+ *
  */
- .post('/school_years/create',accessByToken,
+  .post('/school_years/create',accessByToken,
     [
-     body('name').notEmpty().escape().trim().withMessage('year name required')
-      .custom(async(value)=>{
-        const year=await schoolYearRepository.findBy({name:value.trim()})
-        if(year){
-            throw new Error('School year already exists')
-        }
-        return true;
-      })
-    ], 
+      body('name').notEmpty().escape().trim().withMessage('year name required')
+        .custom(async(value)=>{
+          const year=await schoolYearRepository.findBy({name:value.trim()});
+          if(year){
+            throw new Error('School year already exists');
+          }
+          return true;
+        }),
+    ],
 
     validateRequest,
 
     async(req,res)=>{
-        const {name}=req.body;
-        try{
-            const schoolYear=await schoolYearRepository.create({
-                name,
-                by:req.user.id,
-            })
-            res.json(schoolYear)
-        }
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:'Server error'})
-        }
+      const {name}=req.body;
+      try{
+        const schoolYear=await schoolYearRepository.create({
+          name,
+          by:req.user.id,
+        });
+        res.json(schoolYear);
+      }
+      catch(err){
+        console.log(err.message);
+        res.status(500).json({error:'Server error'});
+      }
     })
- 
-    /**
+
+/**
  * @swagger
  * /school_years/update:
  *   put:
  *     summary: change an existing school year
- *     tags: [School-Years] 
+ *     tags: [School-Years]
  *     requestBody:
  *       required: true
  *       content:
@@ -133,7 +133,7 @@ const router=express.Router();
  *               name:
  *                 type: string
  *                 example: 2024-2025 or 2024/2025
- *              
+ *
  *     responses:
  *       200:
  *         content:
@@ -145,48 +145,48 @@ const router=express.Router();
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object 
+ *               type: object
  *       500:
  *         content:
  *           application/json:
  *             schema:
  *               type: object
- *               
- *                          
+ *
+ *
  */
   .put('/school_years/update',accessByToken,
-    
+
     [
-        body('school_year_id').notEmpty().withMessage('school year id required')
-            .isInt({min:1}).withMessage('id must be a positive integer'),
-        
-        body('name').notEmpty().escape().trim().withMessage('school year name required')
-            .custom(async(value)=>{
-            const year=await schoolYearRepository.findBy({name:value})
-            if(year){
-                throw new Error('School year already exists')
-            }
-            return true;
-        })
+      body('school_year_id').notEmpty().withMessage('school year id required')
+        .isInt({min:1}).withMessage('id must be a positive integer'),
+
+      body('name').notEmpty().escape().trim().withMessage('school year name required')
+        .custom(async(value)=>{
+          const year=await schoolYearRepository.findBy({name:value});
+          if(year){
+            throw new Error('School year already exists');
+          }
+          return true;
+        }),
     ],
-    
+
     validateRequest,
 
     async(req,res)=>{
-        
-        const {name,school_year_id}=req.body;
 
-        try{
-            const schoolYear=await schoolYearRepository.update(
-                {name},
-                {id:school_year_id}
-           );
-            res.json(schoolYear);
-        }
-        catch(err) {
-            console.log(err.message);
-            res.status(500).json({error:'Server error'})
-        }
+      const {name,school_year_id}=req.body;
+
+      try{
+        const schoolYear=await schoolYearRepository.update(
+          {name},
+          {id:school_year_id},
+        );
+        res.json(schoolYear);
+      }
+      catch(err) {
+        console.log(err.message);
+        res.status(500).json({error:'Server error'});
+      }
     })
 
   /**
@@ -196,7 +196,7 @@ const router=express.Router();
  *   delete:
  *     summary: Delete school year
  *     description: Delete a school year by its ID
- *     tags: 
+ *     tags:
  *       - School-Years
  *     parameters:
  *       - name: id
@@ -217,31 +217,31 @@ const router=express.Router();
  *         content:
  *            application/json:
  *              schema:
- *                type: object 
+ *                type: object
  *       500:
  *         content:
  *           application/json:
  *             schema:
- *               type: object   
- * 
- */  
+ *               type: object
+ *
+ */
   .delete('/school_years/remove/:id',accessByToken,
     [
-        param('id').notEmpty().withMessage('school year id required').isInt({min:1}).withMessage('school year id must be a positive integer')
+      param('id').notEmpty().withMessage('school year id required').isInt({min:1}).withMessage('school year id must be a positive integer'),
     ],
 
     validateRequest,
-   
+
     async(req,res)=>{
 
-        const {id}=req.params;    
-        try{
-            const schoolYear=await schoolYearRepository.remove({id});
-            res.json(schoolYear);
-        } 
-        catch(err){
-            console.log(err.message);
-            res.status(500).json({error:err.message});
-        }
-  })  
- module.exports=router
+      const {id}=req.params;
+      try{
+        const schoolYear=await schoolYearRepository.remove({id});
+        res.json(schoolYear);
+      }
+      catch(err){
+        console.log(err.message);
+        res.status(500).json({error:err.message});
+      }
+    });
+module.exports=router;

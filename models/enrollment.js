@@ -7,7 +7,7 @@ module.exports=class Enrollment extends Model {
   }
 
   static get relationMappings() {
-   
+
     return {
       student: {
         relation: Model.BelongsToOneRelation,
@@ -32,9 +32,9 @@ module.exports=class Enrollment extends Model {
           from: 'enrollments.school_year_id',
           to: 'school_years.id',
         },
-      }
+      },
     };
   }
-}
+};
 
 

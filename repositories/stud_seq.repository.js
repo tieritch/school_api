@@ -24,7 +24,7 @@ const studentSeqRepository = {
 
       return 1;
     }
-  }
+  },
 };
 
 module.exports = studentSeqRepository;

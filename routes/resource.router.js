@@ -35,11 +35,11 @@ router
  *                   name:
  *                     type: string
  *                     description: Resource's name
- * 
- *                  
+ *
+ *
  */
-.get('/resources',async(req,res)=>{
+  .get('/resources',async(req,res)=>{
     const resources=await resourceRepository.findAll();
     res.json(resources);
-})
+  });
 module.exports=router;

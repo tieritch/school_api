@@ -6,7 +6,7 @@ exports.seed = async function (knex) {
   await knex('roles').del();
   await knex('users').del();
 
-  //  Insert admin user 
+  //  Insert admin user
   const hashedPass = await bcrypt.hash(process.env.ADMIN_PASS, 10);
   const [{ id: adminUserId }] = await knex('users')
     .insert([{
@@ -14,7 +14,7 @@ exports.seed = async function (knex) {
       firstname: 'admin',
       lastname: '',
       password: hashedPass,
-      email: 'admin@gmail.com'
+      email: 'admin@gmail.com',
     }])
     .returning('id');
 
@@ -25,7 +25,7 @@ exports.seed = async function (knex) {
 
   //  Link user ↔ role
   await knex('users_roles').insert([
-    { user_id: adminUserId, role_id: adminRoleId }
+    { user_id: adminUserId, role_id: adminRoleId },
   ]);
 
   // Permissions (idempotent)

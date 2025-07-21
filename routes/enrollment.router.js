@@ -143,15 +143,15 @@ router
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-  
-        const {student_id,school_year_id,grade_id}=req.body;
-  
-        const enrollment=await enrollmentRepository.create({student_id,school_year_id,grade_id});
-        const stdWithGraph=await studentRepository
-          .findAll().withGraphFetched('[grades,schoolYears]')
-          .where({id:student_id});
-        console.log(JSON.stringify(stdWithGraph,null,2));
-        res.send(stdWithGraph[0]);
+
+      const {student_id,school_year_id,grade_id}=req.body;
+
+      const enrollment=await enrollmentRepository.create({student_id,school_year_id,grade_id});
+      const stdWithGraph=await studentRepository
+        .findAll().withGraphFetched('[grades,schoolYears]')
+        .where({id:student_id});
+      console.log(JSON.stringify(stdWithGraph,null,2));
+      res.send(stdWithGraph[0]);
     }))
 
 /**
@@ -206,12 +206,12 @@ router
 
     asyncHandler(async(req,res)=>{
       // console.log('DELETE HIT', req.params.id);
-        const{id}=req.params;
-        const enroll=await enrollmentRepository.remove({id});
-        const stdWithGraph=await studentRepository
+      const{id}=req.params;
+      const enroll=await enrollmentRepository.remove({id});
+      const stdWithGraph=await studentRepository
         .findAll().withGraphFetched('[grades,schoolYears]')
         .where({id:enroll[0].student_id});
-        res.json(stdWithGraph);   
+      res.json(stdWithGraph);
     }))
 
 
@@ -303,15 +303,15 @@ router
       }
       enrollment.id=req.body.id;
       const enroll=await enrollmentRepository.updateBy(
-      {
-        grade_id:enrollment.grade_id,
-        school_year_id:enrollment.school_year_id,
-       },{
+        {
+          grade_id:enrollment.grade_id,
+          school_year_id:enrollment.school_year_id,
+        },{
           id:enrollment.id,
         });
-       const stdWithGraph=await studentRepository
-          .findAll().withGraphFetched('[grades,schoolYears]')
-          .where({id:enroll[0].student_id});
-        res.json(stdWithGraph);
+      const stdWithGraph=await studentRepository
+        .findAll().withGraphFetched('[grades,schoolYears]')
+        .where({id:enroll[0].student_id});
+      res.json(stdWithGraph);
     }));
 module.exports=router;

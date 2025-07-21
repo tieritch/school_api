@@ -11,21 +11,21 @@ const {asyncHandler}=require('../utils');
  *     CourseType:
  *       type: object
  *       properties:
- *         name: 
+ *         name:
  *           type: string
  *           example: technical
- *        
- *           
+ *
+ *
  */
- router
- /**
+router
+/**
   * @swagger
   * tags:
   *   name: Course-Types
   *   summary: course type
   *   description: course type management endpoints.
   */
- /**
+/**
  * @swagger
  * /course_types:
  *   get:
@@ -45,21 +45,21 @@ const {asyncHandler}=require('../utils');
  *                     type: integer
  *                   name:
  *                     type: string
- *                    
- *                  
+ *
+ *
  */
- .get('/course_types', accessByToken, accessByRole(['READ'],['course_types']), 
+  .get('/course_types', accessByToken, accessByRole(['READ'],['course_types']),
     async(req,res)=>{
-        const types=await courseTypeRepository.findAll();
-        res.json(types);
-})
+      const types=await courseTypeRepository.findAll();
+      res.json(types);
+    })
 
- /**
+/**
  * @swagger
  * /course_types/create:
  *   post:
  *     summary: creates a course type
- *     tags: [Course-Types] 
+ *     tags: [Course-Types]
  *     requestBody:
  *       required: true
  *       content:
@@ -82,31 +82,31 @@ const {asyncHandler}=require('../utils');
  *         content:
  *           application/json:
  *             schema:
- *               type: object         
- *                          
+ *               type: object
+ *
  */
-.post('/course_types/create',accessByToken, accessByRole(['READ','CREATE'],['course_types']),
+  .post('/course_types/create',accessByToken, accessByRole(['READ','CREATE'],['course_types']),
     [
-        body('name').notEmpty().withMessage('name of course type required')
-            .custom(async(value)=>{
-                const type=await courseTypeRepository.findBy({name:value.trim().toLowerCase()});
-                if(type){
-                    throw new Error('this course type already exists')
-                }
-                return true;
-            }),
+      body('name').notEmpty().withMessage('name of course type required')
+        .custom(async(value)=>{
+          const type=await courseTypeRepository.findBy({name:value.trim().toLowerCase()});
+          if(type){
+            throw new Error('this course type already exists');
+          }
+          return true;
+        }),
 
-    ], 
-    
+    ],
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-    
-        const {name}=req.body;
-        
-        const course=await courseTypeRepository.create({name,by:req.user.id});
-        res.json(course);
- }))
+
+      const {name}=req.body;
+
+      const course=await courseTypeRepository.create({name,by:req.user.id});
+      res.json(course);
+    }))
 
 
 /**
@@ -114,7 +114,7 @@ const {asyncHandler}=require('../utils');
  * /course_types/update:
  *   put:
  *     summary: change an existing course type
- *     tags: [Course-Types] 
+ *     tags: [Course-Types]
  *     requestBody:
  *       required: true
  *       content:
@@ -139,43 +139,43 @@ const {asyncHandler}=require('../utils');
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object 
+ *               type: object
  *       500:
  *         content:
  *           application/json:
  *             schema:
  *               type: object
- *               
- *                          
- */ 
-.put('/course_types/update',accessByToken,accessByRole(['READ','UPDATE'],['course_types']),
+ *
+ *
+ */
+  .put('/course_types/update',accessByToken,accessByRole(['READ','UPDATE'],['course_types']),
     [
-        body('id').notEmpty().withMessage('id of course type required').isInt({min:1}).withMessage('id must be a positive integer')
+      body('id').notEmpty().withMessage('id of course type required').isInt({min:1}).withMessage('id must be a positive integer')
         .custom(async(value)=>{
-            const type=await courseTypeRepository.findBy({id:value});
-            if(!type){
-                throw new Error('this course type does not exist')
-            }
-            return true;
+          const type=await courseTypeRepository.findBy({id:value});
+          if(!type){
+            throw new Error('this course type does not exist');
+          }
+          return true;
         }),
-        
-        body('name').notEmpty().withMessage(' course type name required')
+
+      body('name').notEmpty().withMessage(' course type name required')
         .custom(async(value)=>{
-            const type=await courseTypeRepository.findBy({name: value.trim().toLowerCase()});
-            if(type){
-                throw new Error('this course type already exist')
-            }
-        })
+          const type=await courseTypeRepository.findBy({name: value.trim().toLowerCase()});
+          if(type){
+            throw new Error('this course type already exist');
+          }
+        }),
     ],
-    
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-        
-        const {name,id}=req.body;
-        const type=await courseTypeRepository.updateBy({name},{id});
-        res.json(type);
-  }))
+
+      const {name,id}=req.body;
+      const type=await courseTypeRepository.updateBy({name},{id});
+      res.json(type);
+    }))
 
 /**
  * @swagger
@@ -209,21 +209,21 @@ const {asyncHandler}=require('../utils');
  *         content:
  *           application/json:
  *             schema:
- *               type: object   
- * 
+ *               type: object
+ *
  */
-.delete('/course_types/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['course_types']),
-  [
-    param('id').notEmpty().withMessage('course type ID required').isInt({min:1})
-        .withMessage('course type ID id must be a positive integer')
-  ],
+  .delete('/course_types/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['course_types']),
+    [
+      param('id').notEmpty().withMessage('course type ID required').isInt({min:1})
+        .withMessage('course type ID id must be a positive integer'),
+    ],
 
-  validateRequest,
+    validateRequest,
 
-  asyncHandler(async(req,res)=>{
-        const {id}=req.params;
+    asyncHandler(async(req,res)=>{
+      const {id}=req.params;
 
-        const type=await courseTypeRepository.remove({id});
-        res.json(type);
-  }))
+      const type=await courseTypeRepository.remove({id});
+      res.json(type);
+    }));
 module.exports=router;

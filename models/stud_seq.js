@@ -8,5 +8,5 @@ module.exports=class StudentSequence extends Model {
   static get idColumn() {
     return 'year'; // primary key
   }
-}
+};
 

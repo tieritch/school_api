@@ -3,11 +3,11 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
-   
-    return knex.schema.alterTable('courses',(table)=>{
-        table.integer('max_score').notNullable();
-        table.integer('by');
-    })
+
+  return knex.schema.alterTable('courses',(table)=>{
+    table.integer('max_score').notNullable();
+    table.integer('by');
+  });
 };
 
 /**
@@ -15,8 +15,8 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-   return knex.schema.alterTable('courses',(table)=>{
+  return knex.schema.alterTable('courses',(table)=>{
     table.dropColumn('max_score');
     table.dropColumn('by');
-   })
+  });
 };

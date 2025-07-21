@@ -1,6 +1,6 @@
 const {academicPeriodRepository,
-    academicSubdivisionRepository,
-    schoolYearRepository
+  academicSubdivisionRepository,
+  schoolYearRepository,
 }=require('../repositories');
 const {accessByToken,accessByRole,validateRequest}=require('../middlewares');
 const {query,body,param}=require('express-validator');
@@ -26,8 +26,8 @@ const router=express.Router();
  *
  */
 
- router
- /**
+router
+/**
    * @swagger
    * tags:
    *   name: Academic-Periods
@@ -35,7 +35,7 @@ const router=express.Router();
    *   description: Academic period management endpoints.
    */
 
-  /**
+/**
   * @swagger
   * /academic_periods:
   *   get:
@@ -58,18 +58,18 @@ const router=express.Router();
   *
   */
 
-    .get('/academic_periods', accessByToken, accessByRole(['READ'],['academic_periods']),
-        async(req,res)=>{
-            let subdivs=await academicPeriodRepository.findAll();
-            res.json(subdivs);
+  .get('/academic_periods', accessByToken, accessByRole(['READ'],['academic_periods']),
+    async(req,res)=>{
+      const subdivs=await academicPeriodRepository.findAll();
+      res.json(subdivs);
     })
 
-    /**
+/**
      * @swagger
      * /academic_periods/create:
      *   post:
      *     summary: creates an academic period
-     *     tags: [Academic-Periods] 
+     *     tags: [Academic-Periods]
      *     requestBody:
      *       required: true
      *       content:
@@ -88,58 +88,58 @@ const router=express.Router();
      *           applicaction/json:
      *             schema:
      *               type: object
-     *               
-     *                          
+     *
+     *
      */
-    .post('/academic_periods/create',accessByToken,accessByRole(['READ','CREATE'],['academic_periods']),
-        [
-            body('academic_subdivision_id').notEmpty().withMessage(' academic subdivision ID required')
-                .isInt({min:1}).withMessage('Academic subdivision must be a positive integer')
-                .custom(async(value)=>{
-                const subdiv=await academicSubdivisionRepository.findBy({id:value});
-                if(!subdiv){
-                    throw Error('This academic subdivision ID does not exist')
-                }
-                const numberOfPeriods=subdiv.number_of_periods;
-                let allPeriods=await academicPeriodRepository.findAll();
-                
-                // filter periods of the relevant school year;
-                allPeriods=allPeriods.filter(period=>period.academic_subdivision_id==value);
-                
-                // prevent insert if number of periods reaches the value set by numberOfPeriods
-                if(allPeriods.length==numberOfPeriods){
-                    throw Error('The number of periods is enough for this school year')
-                }
-                return true
-            }),
+  .post('/academic_periods/create',accessByToken,accessByRole(['READ','CREATE'],['academic_periods']),
+    [
+      body('academic_subdivision_id').notEmpty().withMessage(' academic subdivision ID required')
+        .isInt({min:1}).withMessage('Academic subdivision must be a positive integer')
+        .custom(async(value)=>{
+          const subdiv=await academicSubdivisionRepository.findBy({id:value});
+          if(!subdiv){
+            throw Error('This academic subdivision ID does not exist');
+          }
+          const numberOfPeriods=subdiv.number_of_periods;
+          let allPeriods=await academicPeriodRepository.findAll();
 
-            body('name').notEmpty().withMessage('Name of academic period required').escape()
-            .custom(async(value,{req})=>{
-                const period=await academicPeriodRepository.findBy({
-                    name:value.trim().toLowerCase(),
-                    academic_subdivision_id:req.body.academic_subdivision_id
-                });
-                if(period){
-                    throw new Error('This academic period name already exist for the same school year')
-                }
-                return true;
-            })
+          // filter periods of the relevant school year;
+          allPeriods=allPeriods.filter(period=>period.academic_subdivision_id==value);
 
-            
-        ],
+          // prevent insert if number of periods reaches the value set by numberOfPeriods
+          if(allPeriods.length==numberOfPeriods){
+            throw Error('The number of periods is enough for this school year');
+          }
+          return true;
+        }),
 
-        validateRequest,
+      body('name').notEmpty().withMessage('Name of academic period required').escape()
+        .custom(async(value,{req})=>{
+          const period=await academicPeriodRepository.findBy({
+            name:value.trim().toLowerCase(),
+            academic_subdivision_id:req.body.academic_subdivision_id,
+          });
+          if(period){
+            throw new Error('This academic period name already exist for the same school year');
+          }
+          return true;
+        }),
 
-        asyncHandler(async(req,res)=>{
 
-            const {name,academic_subdivision_id}=req.body;
-            const period=await academicPeriodRepository.create({name,academic_subdivision_id,by:req.user.id});
-            res.json(period);
-        })
-    )
+    ],
 
-   
-     /**
+    validateRequest,
+
+    asyncHandler(async(req,res)=>{
+
+      const {name,academic_subdivision_id}=req.body;
+      const period=await academicPeriodRepository.create({name,academic_subdivision_id,by:req.user.id});
+      res.json(period);
+    }),
+  )
+
+
+/**
  * @swagger
  * /academic_periods/update:
  *   patch:
@@ -182,56 +182,56 @@ const router=express.Router();
  *
  *
  */
-    .patch('/academic_periods/update',accessByToken, accessByRole(['READ','UPDATE'],['academic_periods']),
+  .patch('/academic_periods/update',accessByToken, accessByRole(['READ','UPDATE'],['academic_periods']),
     [
-        body('id').notEmpty().withMessage('academic period ID required')
-            .isInt({min:1}).withMessage('academic period ID must be a positive integer')
-            .custom(async(value)=>{
-                const period=await academicPeriodRepository.findBy({id:value});
-                if(!period){
-                    throw new Error('This academic period  does not exist')
-                }
-                return true;
-            }),
-            
-        body('academic_subdivision_id').optional().notEmpty().withMessage(' academic subdivision ID required')
-            .isInt({min:1}).withMessage('academic subdivbision_id must be a positive integer')
-            .custom(async(value)=>{
-                const subdiv=await academicSubdivisionRepository.findBy({id:value});
-                if(!subdiv){
-                    throw new Error('This academic subdivision does not exist')
-                }
-                return true;
-            }),
-            
-         body('name').optional().notEmpty().withMessage('academic period name required').escape()
-            .custom(async(value,{req})=>{
-            const whereCondition={};
-            if(req.body.academic_subdivision_id){
-                 whereCondition.academic_subdivision_id=req.body.academic_subdivision_id;
-            }
-            whereCondition.name=value.trim().toLowerCase();
-            const period=await academicPeriodRepository.findBy(whereCondition);
-            if(period){
-                throw new Error('This academic period name already exist for the same school year')
-            }
-            return true;
-        })
+      body('id').notEmpty().withMessage('academic period ID required')
+        .isInt({min:1}).withMessage('academic period ID must be a positive integer')
+        .custom(async(value)=>{
+          const period=await academicPeriodRepository.findBy({id:value});
+          if(!period){
+            throw new Error('This academic period  does not exist');
+          }
+          return true;
+        }),
+
+      body('academic_subdivision_id').optional().notEmpty().withMessage(' academic subdivision ID required')
+        .isInt({min:1}).withMessage('academic subdivbision_id must be a positive integer')
+        .custom(async(value)=>{
+          const subdiv=await academicSubdivisionRepository.findBy({id:value});
+          if(!subdiv){
+            throw new Error('This academic subdivision does not exist');
+          }
+          return true;
+        }),
+
+      body('name').optional().notEmpty().withMessage('academic period name required').escape()
+        .custom(async(value,{req})=>{
+          const whereCondition={};
+          if(req.body.academic_subdivision_id){
+            whereCondition.academic_subdivision_id=req.body.academic_subdivision_id;
+          }
+          whereCondition.name=value.trim().toLowerCase();
+          const period=await academicPeriodRepository.findBy(whereCondition);
+          if(period){
+            throw new Error('This academic period name already exist for the same school year');
+          }
+          return true;
+        }),
     ],
-        
+
     validateRequest,
-        
+
     asyncHandler(async(req,res)=>{
-          
-        const periodInfo={},whereCondition={}
-        if(req.body.name)
-            periodInfo.name=req.body.name;
-        if(req.body.academic_subdivision_id)
-            periodInfo.academic_subdivision_id=req.body.academic_subdivision_id;
-        periodInfo.by=req.user.id;
-        whereCondition.id=req.body.id;
-        const period=await academicPeriodRepository.updateBy(periodInfo,whereCondition);
-        res.json(period);
+
+      const periodInfo={},whereCondition={};
+      if(req.body.name)
+      {periodInfo.name=req.body.name;}
+      if(req.body.academic_subdivision_id)
+      {periodInfo.academic_subdivision_id=req.body.academic_subdivision_id;}
+      periodInfo.by=req.user.id;
+      whereCondition.id=req.body.id;
+      const period=await academicPeriodRepository.updateBy(periodInfo,whereCondition);
+      res.json(period);
     }) )
 
 /**
@@ -269,27 +269,27 @@ const router=express.Router();
  *               type: object
  *
  */
-.delete('/academic_periods/remove/:id',accessByToken, accessByRole(['READ','DELETE'],['academic_periods']),
+  .delete('/academic_periods/remove/:id',accessByToken, accessByRole(['READ','DELETE'],['academic_periods']),
     [
-        param('id').notEmpty().withMessage('academic period ID required').isInt({min:1})
-            .isInt({min:1}).withMessage('academic period ID must be a positive integer')
-            .custom(async(value)=>{
-                const period=await academicPeriodRepository.findBy({id:value});
-                if(!period){
-                    throw new Error('This academic period  does not exist')
-                }
-                return true;
-            }), 
+      param('id').notEmpty().withMessage('academic period ID required').isInt({min:1})
+        .isInt({min:1}).withMessage('academic period ID must be a positive integer')
+        .custom(async(value)=>{
+          const period=await academicPeriodRepository.findBy({id:value});
+          if(!period){
+            throw new Error('This academic period  does not exist');
+          }
+          return true;
+        }),
     ],
-    
-    validateRequest, 
-    
-    asyncHandler(async(req,res)=>{
-        const {id}=req.params;
-        const period=await academicPeriodRepository.remove({id});
-        res.json(period)
-}))
-    
-    module.exports=router;
 
-    
+    validateRequest,
+
+    asyncHandler(async(req,res)=>{
+      const {id}=req.params;
+      const period=await academicPeriodRepository.remove({id});
+      res.json(period);
+    }));
+
+module.exports=router;
+
+

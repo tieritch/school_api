@@ -3,9 +3,9 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
-   return knex.schema.alterTable('scores',(table)=>{
+  return knex.schema.alterTable('scores',(table)=>{
     table.integer('by').notNullable();
-   })
+  });
 };
 
 /**
@@ -13,7 +13,7 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-    return knex.schema.alterTable('scores',(table)=>{
-        table.dropColumn('by');
-       })
+  return knex.schema.alterTable('scores',(table)=>{
+    table.dropColumn('by');
+  });
 };

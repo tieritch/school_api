@@ -16,11 +16,11 @@ function sanitizeInput(input) {
 
 function sanitizeData(req, res, next) {
   if(req.body)
-    req.body = sanitizeInput(req.body);
+  {req.body = sanitizeInput(req.body);}
   if(req.param)
-    req.param=sanitizeInput(req.param);
+  {req.param=sanitizeInput(req.param);}
   if(req.query)
-    req.query=sanitizeInput(req.query);
+  {req.query=sanitizeInput(req.query);}
   next();
 };
 module.exports = sanitizeData;

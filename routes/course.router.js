@@ -132,9 +132,9 @@ router
 
     asyncHandler(async(req,res)=>{
 
-        const {name,course_type_id,max_score}=req.body;
-        const course=await courseRepository.create({name,course_type_id,max_score,by:req.user.id});
-        res.json(course);
+      const {name,course_type_id,max_score}=req.body;
+      const course=await courseRepository.create({name,course_type_id,max_score,by:req.user.id});
+      res.json(course);
     }))
 
 /**
@@ -221,20 +221,20 @@ router
 
     asyncHandler(async(req,res)=>{
 
-        const courseInfo={};
-        if(req.body.name){
-          courseInfo.name=req.body.name;
-        }
-        if(req.body.course_type_id){
-          courseInfo.course_type_id=req.body.course_type_id;
-        }
-        if(req.body.max_score){
-          courseInfo.max_score=req.body.max_score;
-        }
-        courseInfo.by=req.user.id;
-        const whereCondition={id:req.body.id};
-        const course=await courseRepository.updateBy(courseInfo,whereCondition);
-        res.json(course);
+      const courseInfo={};
+      if(req.body.name){
+        courseInfo.name=req.body.name;
+      }
+      if(req.body.course_type_id){
+        courseInfo.course_type_id=req.body.course_type_id;
+      }
+      if(req.body.max_score){
+        courseInfo.max_score=req.body.max_score;
+      }
+      courseInfo.by=req.user.id;
+      const whereCondition={id:req.body.id};
+      const course=await courseRepository.updateBy(courseInfo,whereCondition);
+      res.json(course);
     }))
 
 /**
@@ -289,9 +289,9 @@ router
 
     asyncHandler(async(req,res)=>{
 
-        const {id}=req.params;
-        const course=await courseRepository.remove({id});
-        res.json(course);
+      const {id}=req.params;
+      const course=await courseRepository.remove({id});
+      res.json(course);
     }));
 
 module.exports=router;

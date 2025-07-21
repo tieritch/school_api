@@ -26,7 +26,7 @@ const router=express.Router();
  *
  */
 
- router
+router
 /**
   * @swagger
   * tags:
@@ -35,7 +35,7 @@ const router=express.Router();
   *   description: Academic subdivision management endpoints.
   */
 
-  /**
+/**
   * @swagger
   * /academic_subdivisions:
   *   get:
@@ -60,16 +60,16 @@ const router=express.Router();
 
   .get('/academic_subdivisions', accessByToken, accessByRole(['READ'],['academic_subdivisions']),
     async(req,res)=>{
-        const subdivisions=await academicSubdivisionRepository.findAll();
-        res.json(subdivisions);
+      const subdivisions=await academicSubdivisionRepository.findAll();
+      res.json(subdivisions);
     })
 
-    /**
+/**
      * @swagger
      * /academic_subdivisions/create:
      *   post:
      *     summary: creates an academic subdivision
-     *     tags: [Academic-Subdivisions] 
+     *     tags: [Academic-Subdivisions]
      *     requestBody:
      *       required: true
      *       content:
@@ -88,43 +88,43 @@ const router=express.Router();
      *           applicaction/json:
      *             schema:
      *               type: object
-     *               
-     *                          
+     *
+     *
      */
   .post('/academic_subdivisions/create',accessByToken, accessByRole(['READ','CREATE'],['academic_subdivisions']),
     [
-        body('school_year_id').notEmpty().withMessage('school year ID required').isInt({min:1}).withMessage('school year ID must be a positive integer')
+      body('school_year_id').notEmpty().withMessage('school year ID required').isInt({min:1}).withMessage('school year ID must be a positive integer')
         .custom(async(value)=>{
-            const schoolYear=await schoolYearRepository.findBy({id:value});
-            if(!schoolYear){
-                throw new Error('This school year ID does not exist')
-            }
-            const academicSub=await academicSubdivisionRepository.findBy({school_year_id:value});
-            if(academicSub){
-                throw new Error('an academic subdivision already exist for this school year')
-            }
-            return true;
-            }),
+          const schoolYear=await schoolYearRepository.findBy({id:value});
+          if(!schoolYear){
+            throw new Error('This school year ID does not exist');
+          }
+          const academicSub=await academicSubdivisionRepository.findBy({school_year_id:value});
+          if(academicSub){
+            throw new Error('an academic subdivision already exist for this school year');
+          }
+          return true;
+        }),
 
-        body('name').notEmpty().withMessage('academic subdivision name required').escape()
-            .custom(async(value)=>{
-                const subdivision=await academicSubdivisionRepository.findBy({name:value.trim().toLowerCase()});
-                if(subdivision){
-                    throw new Error('This academic subdivision already exist')
-                }
-                return true;
-        })
+      body('name').notEmpty().withMessage('academic subdivision name required').escape()
+        .custom(async(value)=>{
+          const subdivision=await academicSubdivisionRepository.findBy({name:value.trim().toLowerCase()});
+          if(subdivision){
+            throw new Error('This academic subdivision already exist');
+          }
+          return true;
+        }),
     ],
 
     validateRequest,
-    
-    asyncHandler(async(req,res)=>{
-        const {name,school_year_id,number_of_periods}=req.body;
-        const subdivision=await academicSubdivisionRepository.create({name,school_year_id,number_of_periods,by:req.user.id});
-        res.json(subdivision);
- }))
 
- /**
+    asyncHandler(async(req,res)=>{
+      const {name,school_year_id,number_of_periods}=req.body;
+      const subdivision=await academicSubdivisionRepository.create({name,school_year_id,number_of_periods,by:req.user.id});
+      res.json(subdivision);
+    }))
+
+/**
  * @swagger
  * /academic_subdivisions/update:
  *   patch:
@@ -170,64 +170,64 @@ const router=express.Router();
  *
  *
  */
- .patch('/academic_subdivisions/update',accessByToken,accessByRole(['READ','UPDATE'],['academic_subdivisions']),
+  .patch('/academic_subdivisions/update',accessByToken,accessByRole(['READ','UPDATE'],['academic_subdivisions']),
     [
-        body('id').notEmpty().withMessage('academic subdivision ID required')
-            .isInt({min:1}).withMessage('academic subdivision ID must be a positive integer')
-            .custom(async(value)=>{
-                const subdivision=await academicSubdivisionRepository.findBy({id:value});
-                if(!subdivision){
-                    throw new Error('This academic subdivision does not exist')
-                }
-                return true;
-            }),
-        
-        body('name').optional().notEmpty().withMessage('academic subdivision name required').escape()
-            .custom(async(value)=>{
-                const subdivision=await academicSubdivisionRepository.findBy({name:value.trim().toLowerCase()});
-                if(subdivision){
-                    throw new Error('This academic subdivision already exist')
-                }
-                return true;
-            }),
-        
-        body('number_of_periods').optional().notEmpty()
-            .withMessage('Number of periods required')
-            .isInt({min:1}).withMessage('Number of periods must be a positive integer'),
-        
-        body('school_year_id').optional().notEmpty().withMessage('school year ID required')
-            .isInt({min:1}).withMessage('school year ID must be a positive integer')
-            .custom(async(value)=>{
-                const year=await schoolYearRepository.findBy({id:value});
-                if(!year){
-                    throw new Error(' This school year ID does not exist')
-                }
-                return true;
-            })
+      body('id').notEmpty().withMessage('academic subdivision ID required')
+        .isInt({min:1}).withMessage('academic subdivision ID must be a positive integer')
+        .custom(async(value)=>{
+          const subdivision=await academicSubdivisionRepository.findBy({id:value});
+          if(!subdivision){
+            throw new Error('This academic subdivision does not exist');
+          }
+          return true;
+        }),
+
+      body('name').optional().notEmpty().withMessage('academic subdivision name required').escape()
+        .custom(async(value)=>{
+          const subdivision=await academicSubdivisionRepository.findBy({name:value.trim().toLowerCase()});
+          if(subdivision){
+            throw new Error('This academic subdivision already exist');
+          }
+          return true;
+        }),
+
+      body('number_of_periods').optional().notEmpty()
+        .withMessage('Number of periods required')
+        .isInt({min:1}).withMessage('Number of periods must be a positive integer'),
+
+      body('school_year_id').optional().notEmpty().withMessage('school year ID required')
+        .isInt({min:1}).withMessage('school year ID must be a positive integer')
+        .custom(async(value)=>{
+          const year=await schoolYearRepository.findBy({id:value});
+          if(!year){
+            throw new Error(' This school year ID does not exist');
+          }
+          return true;
+        }),
 
     ],
-    
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-        
-        let subdivisionInfo={},whereCondition={} 
-        if(req.body.name){
-            subdivisionInfo.name=req.body.name
-        }
-        if(req.body.number_of_periods){
-            subdivisionInfo.number_of_periods=req.body.number_of_periods;
-        }
-        if(req.body.school_year_id){
-            subdivisionInfo.school_year_id=req.body.school_year_id;
-        }
-        whereCondition.id=req.body.id;
 
-        const academicSub=await academicSubdivisionRepository.updateBy(subdivisionInfo,whereCondition);
-        res.json(academicSub);
-   }))
+      const subdivisionInfo={},whereCondition={};
+      if(req.body.name){
+        subdivisionInfo.name=req.body.name;
+      }
+      if(req.body.number_of_periods){
+        subdivisionInfo.number_of_periods=req.body.number_of_periods;
+      }
+      if(req.body.school_year_id){
+        subdivisionInfo.school_year_id=req.body.school_year_id;
+      }
+      whereCondition.id=req.body.id;
 
-   /**
+      const academicSub=await academicSubdivisionRepository.updateBy(subdivisionInfo,whereCondition);
+      res.json(academicSub);
+    }))
+
+/**
  * @swagger
  * paths:
  *  /academic_subdivisions/remove/{id}:
@@ -262,25 +262,25 @@ const router=express.Router();
  *               type: object
  *
  */
-   .delete('/academic_subdivisions/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['academic_subdivisions']),
+  .delete('/academic_subdivisions/remove/:id',accessByToken,accessByRole(['READ','DELETE'],['academic_subdivisions']),
     [
-        param('id').notEmpty().withMessage('academic subdivision ID required')
+      param('id').notEmpty().withMessage('academic subdivision ID required')
         .isInt({min:1}).withMessage('academic subdivision ID must be a positive integer')
         .custom(async(value)=>{
-            const subdivision=await academicSubdivisionRepository.findBy({id:value});
-            if(!subdivision){
-                throw new Error('This academic subdivision does not exist')
-            }
-            return true;
+          const subdivision=await academicSubdivisionRepository.findBy({id:value});
+          if(!subdivision){
+            throw new Error('This academic subdivision does not exist');
+          }
+          return true;
         }),
     ],
     validateRequest,
-    
+
     asyncHandler(async(req,res)=>{
 
-        const {id}=req.params;
-        const subdivision=await academicSubdivisionRepository.remove({id});
-        res.json(subdivision);
-    }))
+      const {id}=req.params;
+      const subdivision=await academicSubdivisionRepository.remove({id});
+      res.json(subdivision);
+    }));
 
-   module.exports=router; 
+module.exports=router;

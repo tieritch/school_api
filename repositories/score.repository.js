@@ -7,63 +7,63 @@ const {Model}=require("objection");
 
 const scoreRepository={
 
-     /**
+  /**
       * This function returns list of all scores
-      * @function 
+      * @function
       * @memberof scoreRepository
       * @returns {Array}
       */
-     findAll(){
-        return Score.query();
-    },
-    
-    /**
+  findAll(){
+    return Score.query();
+  },
+
+  /**
     * This function returns one score based on informations provided by entity object
     * @function
     * @memberof scoreRepository
-    * @param {object} entity 
+    * @param {object} entity
     * @returns { object}
     */
-    async findBy(entity){
-        const score=await Score.query().where(entity).first();
-        return score;
-    },
+  async findBy(entity){
+    const score=await Score.query().where(entity).first();
+    return score;
+  },
 
-    /** Create a score based on informations provided by entity object and returns the created score
-      * @function 
+  /** Create a score based on informations provided by entity object and returns the created score
+      * @function
       * @memberof scoreRepository
       * @param {object} entity
       * @returns {object}
       */
-    create(entity){
-        return Score.query().insert(entity).returning('*');
-    },
+  create(entity){
+    return Score.query().insert(entity).returning('*');
+  },
 
-    /**
+  /**
      * Update a score with information based on condition
      * @function
      * @memberof scoreRepository
      * @param {object} information
-     * @param {object} condition 
+     * @param {object} condition
      * @returns {object}
      */
-    updateBy(information,condition){
-        return Score.query().patch(information).where(condition).returning('*');
-    },
-   
-    /**
+  updateBy(information,condition){
+    return Score.query().patch(information).where(condition).returning('*');
+  },
+
+  /**
      * Delete a score based on informations provided by entity object and returns the deleted score`
-     * @function 
+     * @function
      * @memberof scoreRepository
-     * @param {object} entity 
+     * @param {object} entity
      * @returns {object}
      */
-    remove(entity){
-        return Score.query().where(entity)
-        .delete().returning('*');
-    }
-    
-    
-}
+  remove(entity){
+    return Score.query().where(entity)
+      .delete().returning('*');
+  },
+
+
+};
 
 module.exports=scoreRepository;

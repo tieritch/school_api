@@ -5,7 +5,7 @@
 exports.up = function(knex) {
   return knex.schema.alterTable('students',(table)=>{
     table.string('student_number').unique().notNullable();
-  })
+  });
 };
 
 /**
@@ -13,7 +13,7 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-   return knex.schema.alterTable('students',(table)=>{
+  return knex.schema.alterTable('students',(table)=>{
     table.dropColumn('student_number');
-   })
+  });
 };

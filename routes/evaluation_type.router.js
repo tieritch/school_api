@@ -12,14 +12,14 @@ const {asyncHandler}=require('../utils');
  *     EvaluationType:
  *       type: object
  *       properties:
- *         name: 
+ *         name:
  *           type: string
  *           example: "Course Work"
- *        
- *           
+ *
+ *
  */
 
- router
+router
 /**
   * @swagger
   * tags:
@@ -28,7 +28,7 @@ const {asyncHandler}=require('../utils');
   *   description: evaluation type management endpoints.
   */
 
- /**
+/**
  * @swagger
  * /evaluation_types:
  *   get:
@@ -48,24 +48,24 @@ const {asyncHandler}=require('../utils');
  *                     type: integer
  *                   name:
  *                     type: string
- *                    
- *                  
+ *
+ *
  */
-.get('/evaluation_types', accessByToken,accessByRole(['READ'],['evaluation_type']),
-    
+  .get('/evaluation_types', accessByToken,accessByRole(['READ'],['evaluation_type']),
+
     async(req,res)=>{
 
-        const evaluationTypes=await evaluationTypeRepository.findAll();
-        res.json(evaluationTypes);
+      const evaluationTypes=await evaluationTypeRepository.findAll();
+      res.json(evaluationTypes);
     })
 
- 
+
 /**
  * @swagger
  * /evaluation_types/create:
  *   post:
  *     summary: creates an evaluation type
- *     tags: [Evaluation-Types] 
+ *     tags: [Evaluation-Types]
  *     requestBody:
  *       required: true
  *       content:
@@ -88,32 +88,32 @@ const {asyncHandler}=require('../utils');
  *         content:
  *           application/json:
  *             schema:
- *               type: object         
- *                          
+ *               type: object
+ *
  */
-.post('/evaluation_types/create', accessByToken,accessByRole(['READ','CREATE'],['evaluation_types']),
+  .post('/evaluation_types/create', accessByToken,accessByRole(['READ','CREATE'],['evaluation_types']),
     [
-        body('name').notEmpty().withMessage('Evaluation\'s name required').escape()
+      body('name').notEmpty().withMessage('Evaluation\'s name required').escape()
         .custom(async(value)=>{
-            const type=await evaluationTypeRepository.findBy({name:value.trim().toLowerCase()});
-            if(type){
-               throw new Error('this course type already exists')
-            }
-            return true;
-        })
+          const type=await evaluationTypeRepository.findBy({name:value.trim().toLowerCase()});
+          if(type){
+            throw new Error('this course type already exists');
+          }
+          return true;
+        }),
 
     ],
-    
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
-        
-        console.log('req body:',req.body);
-        const {name}=req.body;
-        const type=await evaluationTypeRepository.create({name,by:req.user.id});
-        res.json(type);
-    }
-)) 
+
+      console.log('req body:',req.body);
+      const {name}=req.body;
+      const type=await evaluationTypeRepository.create({name,by:req.user.id});
+      res.json(type);
+    },
+    ))
 
 /**
  * @swagger
@@ -147,37 +147,37 @@ const {asyncHandler}=require('../utils');
  *         content:
  *           application/json:
  *             schema:
- *               type: object   
- * 
+ *               type: object
+ *
  */
-.delete('/evaluation_types/remove/:id', accessByToken,accessByRole(['READ','DELETE'],['evaluation_types']),
+  .delete('/evaluation_types/remove/:id', accessByToken,accessByRole(['READ','DELETE'],['evaluation_types']),
     [
       param('id').notEmpty().withMessage('Evaluation type ID required').isInt({min:1}).withMessage('Evaluation type ID must be an positive integer')
-      .custom(async(value)=>{
-        const type=await evaluationTypeRepository.findBy({id:value});
-        if(!type){
-            throw new Error('This evaluation type does not exist ')
-        }
-        return true;
-      })
-    ], 
-    
+        .custom(async(value)=>{
+          const type=await evaluationTypeRepository.findBy({id:value});
+          if(!type){
+            throw new Error('This evaluation type does not exist ');
+          }
+          return true;
+        }),
+    ],
+
     validateRequest,
 
     asyncHandler(async(req,res)=>{
 
-        const {id}=req.params;
-        const type=await evaluationTypeRepository.remove({id});
-        res.json(type);
-    }
-))
+      const {id}=req.params;
+      const type=await evaluationTypeRepository.remove({id});
+      res.json(type);
+    },
+    ))
 
 /**
  * @swagger
  * /evaluation_types/update:
  *   put:
  *     summary: change an existing evaluation type
- *     tags: [Evaluation-Types] 
+ *     tags: [Evaluation-Types]
  *     requestBody:
  *       required: true
  *       content:
@@ -202,49 +202,49 @@ const {asyncHandler}=require('../utils');
  *         content:
  *           applicaction/json:
  *             schema:
- *               type: object 
+ *               type: object
  *       500:
  *         content:
  *           application/json:
  *             schema:
  *               type: object
- *               
- *                          
- */ 
-.put('/evaluation_types/update',accessByToken,accessByRole(['READ','UPDATE'],['evaluation_types']), 
+ *
+ *
+ */
+  .put('/evaluation_types/update',accessByToken,accessByRole(['READ','UPDATE'],['evaluation_types']),
 
     [
-        body('id').notEmpty().withMessage('Evaluation type ID required').isInt({min:1}).withMessage('Evaluation type ID must be a positive integer')
+      body('id').notEmpty().withMessage('Evaluation type ID required').isInt({min:1}).withMessage('Evaluation type ID must be a positive integer')
         .custom(async(value)=>{
-            const type=await evaluationTypeRepository.findBy({id:value});
-            if(!type){
-                throw new Error('This evaluation type ID does not exist ')
-            }
-            return true;
+          const type=await evaluationTypeRepository.findBy({id:value});
+          if(!type){
+            throw new Error('This evaluation type ID does not exist ');
+          }
+          return true;
         }),
 
-        body('name').notEmpty().withMessage('Evaluation name required')
+      body('name').notEmpty().withMessage('Evaluation name required')
         .custom(async(value)=>{
-            const type=await evaluationTypeRepository.findBy({name:value.trim().toLowerCase()});
-            if(type){
-                throw new Error('This evaluation type already exists ')
-            }
-            return true;
-        })
+          const type=await evaluationTypeRepository.findBy({name:value.trim().toLowerCase()});
+          if(type){
+            throw new Error('This evaluation type already exists ');
+          }
+          return true;
+        }),
     ],
 
-    validateRequest, 
-    
+    validateRequest,
+
     asyncHandler( async(req,res)=>{
-        
-        const {name,id}=req.body;
-        console.log(req.body);
-        let whereCondition={},entityInfo={};
-        entityInfo.name=name;
-        whereCondition.id=id;
-        const type=await evaluationTypeRepository.updateBy(entityInfo,whereCondition)
-        res.json(type)
-    })
-)
+
+      const {name,id}=req.body;
+      console.log(req.body);
+      const whereCondition={},entityInfo={};
+      entityInfo.name=name;
+      whereCondition.id=id;
+      const type=await evaluationTypeRepository.updateBy(entityInfo,whereCondition);
+      res.json(type);
+    }),
+  );
 
 module.exports=router;

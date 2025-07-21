@@ -7,23 +7,23 @@ const dotenv = require("dotenv");
 const path = require("path");
 dotenv.config({path:path.resolve(__dirname, "../.env")});
 const baseConfig={
-    client: 'pg',
-    connection: {
-      database: process.env.DB_NAME,
-      user:     process.env.USER_NAME,
-      password: process.env.DB_PASSWORD,
-    },
-    pool: {
-      min: 2,
-      max: 10
-    },
-    migrations: {
-      tableName: 'knex_migrations'
-    },
-    seeds: {
-      directory: path.resolve(__dirname, './seeds') // <- ici
-    }
-}
+  client: 'pg',
+  connection: {
+    database: process.env.DB_NAME,
+    user:     process.env.USER_NAME,
+    password: process.env.DB_PASSWORD,
+  },
+  pool: {
+    min: 2,
+    max: 10,
+  },
+  migrations: {
+    tableName: 'knex_migrations',
+  },
+  seeds: {
+    directory: path.resolve(__dirname, './seeds'), // <- ici
+  },
+};
 
 module.exports = {
   development: baseConfig,

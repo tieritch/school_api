@@ -41,7 +41,7 @@ module.exports=class Student extends Model {
           },
           to: 'school_years.id',
         },
-      }
+      },
     };
   }
 
@@ -50,4 +50,4 @@ module.exports=class Student extends Model {
       this.student_number=this.student_number.trim().toUpperCase();
     }
   }
-}
+};

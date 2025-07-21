@@ -6,7 +6,7 @@ exports.up = function(knex) {
   return knex.schema.createTable('student_sequences',(table)=>{
     table.string('year',4).primary();
     table.bigInteger('last_seq').notNullable();
-  })
+  });
 };
 
 /**

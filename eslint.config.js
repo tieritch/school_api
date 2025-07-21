@@ -18,7 +18,7 @@ module.exports = defineConfig([
     rules: {
       // Style & lisibilité
       indent: ['error', 2],
-     // quotes: ['error', 'single'],
+      // quotes: ['error', 'single'],
       semi: ['error', 'always'],
       'no-trailing-spaces': 'error',
       'eol-last': ['error', 'always'],
