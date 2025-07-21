@@ -36,7 +36,7 @@ const scoreRepository={
       * @returns {object}
       */
     create(entity){
-        return Score.query().insert(entity).returnin('*');
+        return Score.query().insert(entity).returning('*');
     },
 
     /**
