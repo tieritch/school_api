@@ -30,7 +30,7 @@ A simple RESTful API for managing a school system, featuring authentication, RBA
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
+git clone https://github.com/tieritch/school_api.git
 cd your-repo
 npm install
 ```
