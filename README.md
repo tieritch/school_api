@@ -62,7 +62,7 @@ npm run start
 Once the server is running, visit:
 
 ```
-http://localhost:8700/api-docs
+http://localhost:PORT/api-docs
 ```
 
 To view the interactive API documentation.
