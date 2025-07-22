@@ -9,7 +9,7 @@ A simple RESTful API for managing a school system, featuring authentication, RBA
 - 🔐 JWT-based authentication (access + refresh tokens)
 - 🎭 Role-Based Access Control (RBAC) with  permissions
 - 👤 User system with roles: admin, teacher, student, etc.
-- 📚 Models: User, Role (still adding other entities)
+- 📚 Models wih objection
 - 📘 Interactive documentation using Swagger OpenApi
 - ⚙️ Database migrations  with Knex
 
